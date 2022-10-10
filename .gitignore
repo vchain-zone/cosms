@@ -7,3 +7,6 @@ src/**.js
 coverage
 *.log
 package-lock.json
+
+mochawesome-report
+yarn.lock
