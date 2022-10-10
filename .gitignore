@@ -10,3 +10,7 @@ package-lock.json
 
 mochawesome-report
 yarn.lock
+
+_.npmrc
+.npmrc
+
