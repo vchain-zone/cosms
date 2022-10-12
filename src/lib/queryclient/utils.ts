@@ -25,7 +25,10 @@ export function createProtobufRpcStateClient(
       data: Uint8Array
     ): Promise<Uint8Array> => {
       const path = `/${service}/${method}`;
-      return base.queryUnverified(path, data, self['height']);
-    },
+      const height = self['height'];
+      self['height'] = undefined;
+      // console.debug(` get ${path} at ${height}`);
+      return base.queryUnverified(path, data, height);
+    }
   };
 }
