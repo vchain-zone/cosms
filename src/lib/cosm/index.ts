@@ -1,7 +1,5 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import {
-  SigningStargateClientOptions
-} from '@cosmjs/stargate/build/signingstargateclient';
+import { SigningStargateClientOptions } from '@cosmjs/stargate/build/signingstargateclient';
 import Cosmos from '../cosmos';
 import { provider } from '../providers';
 import { Utils } from '../utils';
@@ -35,12 +33,18 @@ export default class Cosm {
     this.cosmos = new Cosmos(provider);
     this.wasm = new Wasm(provider);
     this.utils = new Utils();
-
   }
 
-  async setSigner(offlineSigner: OfflineSigner, options?: SigningStargateClientOptions) {
+  async setSigner(
+    offlineSigner: OfflineSigner,
+    options?: SigningStargateClientOptions
+  ) {
     this.offlineSinger = offlineSigner;
-    this._wallet = await Wallet.connectWithSigner(this._provider.rpcUrl, offlineSigner, options);
+    this._wallet = await Wallet.connectWithSigner(
+      this._provider.rpcUrl,
+      offlineSigner,
+      options
+    );
   }
 
   async setWallet(wallet: Wallet) {

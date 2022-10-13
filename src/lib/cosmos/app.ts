@@ -1,10 +1,22 @@
 import { provider } from '../providers';
 import {
   createProtobufRpcStateClient,
-  ProtobufRpcStateClient,
+  ProtobufRpcStateClient
 } from '../queryclient/utils';
+import { Wallet } from '../wallet';
 
 export class App {
+  set wallet(value: Wallet) {
+    this._wallet = value;
+  }
+
+  get wallet(): Wallet {
+    if (!this._wallet) {
+      throw 'Must set wallet first';
+    }
+    return this._wallet;
+  }
+
   public message;
   public protobuf;
   public query;
@@ -13,6 +25,7 @@ export class App {
 
   private provider: provider;
   private readonly rpc: ProtobufRpcStateClient;
+  private _wallet: Wallet;
 
   constructor(provider: provider) {
     this.provider = provider;
@@ -33,5 +46,9 @@ export class App {
 
   setMessage(Message: any) {
     this.message = Message(this.rpc);
+  }
+
+  setWallet(wallet: Wallet) {
+    this._wallet = wallet;
   }
 }

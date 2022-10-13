@@ -1,5 +1,9 @@
-import * as Protobuf from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
-import { QueryClientImpl } from 'cosmjs-types/cosmos/distribution/v1beta1/query';
+import * as Protobuf
+  from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
+import {
+  QueryClientImpl
+} from 'cosmjs-types/cosmos/distribution/v1beta1/query';
+import { MsgClientImpl } from 'cosmjs-types/cosmos/distribution/v1beta1/tx';
 
 import { provider } from '../providers';
 
@@ -12,5 +16,6 @@ export class Distribution extends App {
   constructor(provider: provider) {
     super(provider);
     this.setQueryClient(QueryClientImpl);
+    this.setMessage(MsgClientImpl);
   }
 }

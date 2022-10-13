@@ -2,7 +2,7 @@ import { OfflineSigner } from '@cosmjs/proto-signing';
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import {
   SigningStargateClient,
-  SigningStargateClientOptions
+  SigningStargateClientOptions,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { HttpEndpoint } from '@cosmjs/tendermint-rpc/build/rpcclients';
@@ -12,7 +12,6 @@ import { TendermintBatchClient } from '../tendermint-rpc/tendermintbatchclient';
 export default OfflineSigner;
 
 export class Wallet extends SigningStargateClient {
-
   _signer: OfflineSigner;
   _tendermintBatchClient: TendermintBatchClient;
   _tendermintClient: Tendermint34Client;
@@ -55,5 +54,4 @@ export class Wallet extends SigningStargateClient {
     const listAddress = await this.getAddresses();
     return listAddress[0];
   }
-
 }
