@@ -25,11 +25,11 @@ export default class Cosmos {
   private _provider: provider;
   public version: string;
 
-  private app: App;
-  private auth: Auth;
-  private authz: Authz;
-  private bank: Bank;
-  private base: Base;
+  public app: App;
+  public auth: Auth;
+  public authz: Authz;
+  public bank: Bank;
+  public base: Base;
   public capability: Capability;
   public crisis: Crisis;
   public crypto: Crypto;
