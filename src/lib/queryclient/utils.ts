@@ -29,6 +29,6 @@ export function createProtobufRpcStateClient(
       self['height'] = undefined;
       // console.debug(` get ${path} at ${height}`);
       return base.queryUnverified(path, data, height);
-    }
+    },
   };
 }

@@ -1,9 +1,8 @@
 import { provider } from '../providers';
 import {
   createProtobufRpcStateClient,
-  ProtobufRpcStateClient
+  ProtobufRpcStateClient,
 } from '../queryclient/utils';
-
 
 export class App {
   public message;

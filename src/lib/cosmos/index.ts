@@ -22,7 +22,6 @@ import { Upgrade } from './upgrade';
 import { Vesting } from './vesting';
 
 export default class Cosmos {
-
   private _provider: provider;
   public version: string;
 
