@@ -14,3 +14,5 @@ yarn.lock
 _.npmrc
 .npmrc
 
+**/*.tgz
+
