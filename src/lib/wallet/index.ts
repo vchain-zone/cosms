@@ -1,22 +1,20 @@
 import {
   SigningCosmWasmClient,
-  SigningCosmWasmClientOptions,
+  SigningCosmWasmClientOptions
 } from '@cosmjs/cosmwasm-stargate';
 import {
   DirectSecp256k1HdWallet,
   makeCosmoshubPath,
-  OfflineSigner,
+  OfflineSigner
 } from '@cosmjs/proto-signing';
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import {
   SigningStargateClient,
-  SigningStargateClientOptions,
+  SigningStargateClientOptions
 } from '@cosmjs/stargate';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { HttpEndpoint } from '@cosmjs/tendermint-rpc/build/rpcclients';
+
 import { provider } from '../providers';
 
-import { TendermintBatchClient } from '../tendermint-rpc/tendermintbatchclient';
 
 export default OfflineSigner;
 
@@ -39,7 +37,7 @@ export class Wallet {
   ): Promise<Wallet> {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       hdPaths: [makeCosmoshubPath(0)],
-      prefix: prefix,
+      prefix: prefix
     });
     const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
       provider.rpcUrl,
@@ -69,7 +67,7 @@ export class Wallet {
     for (let i = 0; i < amount; i++) {
       const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
         hdPaths: [makeCosmoshubPath(i)],
-        prefix: prefix,
+        prefix: prefix
       });
       const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
         provider.rpcUrl,
