@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@bitauth/libauth": "^1.17.1",
+    "@cosmjs/cosmwasm-stargate": "^0.29.2",
     "@cosmjs/proto-signing": "^0.29.0",
     "@cosmjs/stargate": "^0.29.0",
     "cosmjs-types": "^0.5.1"
