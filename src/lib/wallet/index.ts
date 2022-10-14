@@ -26,12 +26,12 @@ export interface WalletOptions {
 }
 
 export class Wallet {
-  private _signer: DirectSecp256k1HdWallet;
+  private _signer: OfflineSigner;
   private _cosmWasmSigner: SigningCosmWasmClient;
   private _stargateSigner: SigningStargateClient;
   private _account: AccountData;
 
-  public static async getSigner(
+  public static async getWalletFromMnemonic(
     provider: provider,
     mnemonic: string,
     prefix: string,
@@ -55,45 +55,77 @@ export class Wallet {
     return new Wallet(wallet, account, cosmWasmClient, stargateClient);
   }
 
-  public static async getSigners(
+  public static async getWalletsFromMnemonic(
     provider: provider,
     mnemonic: string,
     prefix: string,
     amount: number,
     options?: WalletOptions
   ): Promise<Wallet[]> {
-    const wallets = [];
-    if (amount <= 0) {
-      throw 'Amount must be greater than zero';
+    const paths = [];
+    if (amount <= 1) {
+      throw 'Amount must be greater than one';
     }
     for (let i = 0; i < amount; i++) {
-      const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-        hdPaths: [makeCosmoshubPath(i)],
-        prefix: prefix,
-      });
+      paths.push(makeCosmoshubPath(i));
+    }
+    const wallets = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      hdPaths: paths,
+      prefix: prefix,
+    });
+    const accounts = await wallets.getAccounts();
+    const results = [];
+    for (let i = 0; i < accounts.length; i++) {
       const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
         provider.rpcUrl,
-        wallet,
+        wallets,
         options.cosmWasmOptions
       );
       const stargateClient = await SigningStargateClient.connectWithSigner(
         provider.rpcUrl,
-        wallet,
+        wallets,
         options.stargateOptions
       );
-      const [account] = await wallet.getAccounts();
-      wallets.push(new Wallet(wallet, account, cosmWasmClient, stargateClient));
+      results.push(
+        new Wallet(wallets, accounts[i], cosmWasmClient, stargateClient)
+      );
     }
-    return wallets;
+    return results;
+  }
+
+  public static async getWalletsFromOfflineSigner(
+    provider: provider,
+    signer: OfflineSigner,
+    prefix: string,
+    options?: WalletOptions
+  ): Promise<Wallet[]> {
+    const results = [];
+    const accounts = await signer.getAccounts();
+    for (let i = 0; i < accounts.length; i++) {
+      const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
+        provider.rpcUrl,
+        signer,
+        options.cosmWasmOptions
+      );
+      const stargateClient = await SigningStargateClient.connectWithSigner(
+        provider.rpcUrl,
+        signer,
+        options.stargateOptions
+      );
+      results.push(
+        new Wallet(signer, accounts[i], cosmWasmClient, stargateClient)
+      );
+    }
+    return results;
   }
 
   private constructor(
-    wallet: DirectSecp256k1HdWallet,
+    signer: OfflineSigner,
     account: AccountData,
     cosmWasmSigner: SigningCosmWasmClient,
     stargateSigner: SigningStargateClient
   ) {
-    this._signer = wallet;
+    this._signer = signer;
     this._account = account;
     this._cosmWasmSigner = cosmWasmSigner;
     this._stargateSigner = stargateSigner;
