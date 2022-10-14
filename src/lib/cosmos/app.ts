@@ -45,7 +45,7 @@ export class App {
   }
 
   setMessage(Message: any) {
-    this.message = Message(this.rpc);
+    this.message = new Message(this.rpc);
   }
 
   setWallet(wallet: Wallet) {

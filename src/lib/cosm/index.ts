@@ -1,5 +1,7 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import { SigningStargateClientOptions } from '@cosmjs/stargate/build/signingstargateclient';
+import {
+  SigningStargateClientOptions
+} from '@cosmjs/stargate/build/signingstargateclient';
 import Cosmos from '../cosmos';
 import { provider } from '../providers';
 import { Utils } from '../utils';
@@ -24,7 +26,7 @@ export default class Cosm {
   }
 
   private _provider: provider;
-  utils: Utils;
+  static utils: Utils = new Utils();
   cosmos: Cosmos;
   wasm: Wasm;
 
@@ -32,7 +34,7 @@ export default class Cosm {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
     this.wasm = new Wasm(provider);
-    this.utils = new Utils();
+
   }
 
   async setSigner(
