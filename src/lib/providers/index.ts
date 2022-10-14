@@ -1,5 +1,5 @@
 import { BaseProvider } from './BaseProvider';
 
-export type provider = BaseProvider | null;
+export type Provider = BaseProvider | null;
 
 export { BaseProvider };
