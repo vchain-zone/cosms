@@ -13,7 +13,7 @@ import {
   SigningStargateClientOptions
 } from '@cosmjs/stargate';
 
-import { provider } from '../providers';
+import { Provider } from '../providers';
 
 
 export default OfflineSigner;
@@ -30,7 +30,7 @@ export class Wallet {
   private _account: AccountData;
 
   public static async getSigner(
-    provider: provider,
+    provider: Provider,
     mnemonic: string,
     prefix: string,
     options?: WalletOptions
@@ -54,7 +54,7 @@ export class Wallet {
   }
 
   public static async getSigners(
-    provider: provider,
+    provider: Provider,
     mnemonic: string,
     prefix: string,
     amount: number,

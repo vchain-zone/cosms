@@ -1,4 +1,4 @@
-import { provider } from '../providers';
+import { Provider } from '../providers';
 import {
   createProtobufRpcStateClient,
   ProtobufRpcStateClient
@@ -6,6 +6,8 @@ import {
 import { Wallet } from '../wallet';
 
 export class App {
+  public prefixService: (prefix?: string) => this;
+
   set wallet(value: Wallet) {
     this._wallet = value;
   }
@@ -23,16 +25,17 @@ export class App {
 
   public block: (height?: number) => this;
 
-  private provider: provider;
+  private provider: Provider;
   private readonly rpc: ProtobufRpcStateClient;
   private _wallet: Wallet;
 
-  constructor(provider: provider) {
+  constructor(provider: Provider) {
     this.provider = provider;
     this.rpc = createProtobufRpcStateClient(
       this.provider.batchQueryClient.getQueryClient()
     );
     this.block = this.rpc.block;
+    this.prefixService = this.rpc.prefixService;
     this.message = {};
   }
 
@@ -45,7 +48,7 @@ export class App {
   }
 
   setMessage(Message: any) {
-    this.message = Message(this.rpc);
+    this.message = new Message(this.rpc);
   }
 
   setWallet(wallet: Wallet) {
