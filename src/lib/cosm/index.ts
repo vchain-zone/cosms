@@ -1,6 +1,10 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
+
 import Cosmos from '../cosmos';
 import { Provider } from '../providers';
+import {
+  TendermintBatchClient
+} from '../tendermint-batch-rpc/tendermintbatchclient';
 import { Utils } from '../utils';
 import { Wallet } from '../wallet';
 import { Wasm } from '../wasm';
@@ -26,11 +30,13 @@ export default class Cosm {
   utils: Utils;
   cosmos: Cosmos;
   wasm: Wasm;
+  tendermint: TendermintBatchClient;
 
   constructor(provider: Provider) {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
     this.wasm = new Wasm(provider);
+    this.tendermint = provider.tendermintClient
     this.utils = new Utils();
   }
 

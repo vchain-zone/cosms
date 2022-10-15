@@ -1,5 +1,5 @@
 import { BatchQueryClient } from '../queryclient/batchqueryclient';
-import { TendermintBatchClient } from '../tendermint-rpc/tendermintbatchclient';
+import { TendermintBatchClient } from '../tendermint-batch-rpc/tendermintbatchclient';
 
 export class BaseProvider {
   get batchQueryClient(): BatchQueryClient {
