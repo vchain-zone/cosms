@@ -5,16 +5,14 @@ import {
   StargateClientOptions,
   TxExtension
 } from '@cosmjs/stargate';
-
 import {
   ProvenQuery,
   QueryClient
 } from '@cosmjs/stargate/build/queryclient/queryclient';
-
 import { StargateClient } from '@cosmjs/stargate/build/stargateclient';
 import { HttpEndpoint, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 
-import { TendermintBatchClient } from '../tendermint-rpc/tendermintbatchclient';
+import { TendermintBatchClient } from '../tendermint-batch-rpc/tendermintbatchclient';
 
 export class BatchQueryClient extends StargateClient {
   get tmBatchClient(): TendermintBatchClient {
