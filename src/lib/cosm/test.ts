@@ -8,7 +8,7 @@ async function test2() {
   await provider.connect(rpcUrl);
   let cosm = new Cosm(provider);
 
-  let denom = await cosm.cosmos.mint.prefixService('osmosis').query.Params({});
+  let denom = await cosm.cosmos.mint.prefixServices('osmosis').query.Params({});
   console.log(denom);
 }
 
