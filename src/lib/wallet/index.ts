@@ -1,7 +1,6 @@
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
-  UploadResult,
 } from '@cosmjs/cosmwasm-stargate';
 import {
   DirectSecp256k1HdWallet,
@@ -10,22 +9,12 @@ import {
 } from '@cosmjs/proto-signing';
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import {
-  calculateFee,
-  GasPrice,
   SigningStargateClient,
   SigningStargateClientOptions,
-  StdFee,
 } from '@cosmjs/stargate';
 
 import Cosm from '../cosm';
 import { provider } from '../providers';
-
-const defaultUploadGas = 2500000;
-const defaultInitGas = 1000000;
-const defaultExecGas = 500000;
-const defaultGasPrice = 0.25;
-
-export default OfflineSigner;
 
 export interface WalletOptions {
   readonly cosmWasmOptions: SigningCosmWasmClientOptions;
@@ -159,28 +148,20 @@ export class Wallet {
     this._denom = denom;
   }
 
-  public async uploadWasm(wasmCode: Uint8Array, fee?: StdFee, memo?: string): Promise<UploadResult> {
-    fee = fee == null ? this.getFee(defaultUploadGas, defaultGasPrice) : fee;
-    return await this._cosmWasmSigner.upload(this.address, wasmCode, fee, memo);
-  }
-
-  public async deloyContractFromCodeId(codeId: number){
-
-  }
-
-  public getFee(gas: number, gasPrice: number): StdFee {
-    return calculateFee(
-      gas,
-      GasPrice.fromString(gasPrice.toString() + this._denom)
-    );
-  }
-
   get address(): string {
     return this._account.address;
   }
 
   get denom(): string {
     return this._denom;
+  }
+
+  get cosmWasmSigner(): SigningCosmWasmClient {
+    return this._cosmWasmSigner;
+  }
+
+  get stargateSigner(): SigningStargateClient {
+    return this._stargateSigner;
   }
 }
 
