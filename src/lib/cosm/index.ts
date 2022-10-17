@@ -1,5 +1,4 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import { SigningStargateClientOptions } from '@cosmjs/stargate/build/signingstargateclient';
 import Cosmos from '../cosmos';
 import { Provider } from '../providers';
 import { Utils } from '../utils';
@@ -36,8 +35,9 @@ export default class Cosm {
   }
 
 
-  async setWallet(wallet: Wallet) {
+  setWallet(wallet: Wallet) {
     this._wallet = wallet;
+    this.cosmos.setWallet(wallet);
   }
 
   static readonly version: string = version;

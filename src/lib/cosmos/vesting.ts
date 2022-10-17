@@ -1,3 +1,4 @@
+import * as MsgClient from 'cosmjs-types/cosmos/vesting/v1beta1/tx';
 import { MsgClientImpl } from 'cosmjs-types/cosmos/vesting/v1beta1/tx';
 import * as Protobuf from 'cosmjs-types/cosmos/vesting/v1beta1/vesting';
 
@@ -11,6 +12,6 @@ export class Vesting extends App {
 
   constructor(provider: Provider) {
     super(provider);
-    this.setMessage(MsgClientImpl);
+    this.setMessage(MsgClient);
   }
 }

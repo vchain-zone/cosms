@@ -1,6 +1,6 @@
 import * as Protobuf from 'cosmjs-types/cosmos/feegrant/v1beta1/feegrant';
 import { QueryClientImpl } from 'cosmjs-types/cosmos/feegrant/v1beta1/query';
-import { MsgClientImpl } from 'cosmjs-types/cosmos/feegrant/v1beta1/tx';
+import * as MsgClient from 'cosmjs-types/cosmos/feegrant/v1beta1/tx';
 
 import { Provider } from '../providers';
 
@@ -13,6 +13,6 @@ export class FeeGrant extends App {
   constructor(provider: Provider) {
     super(provider);
     this.setQueryClient(QueryClientImpl);
-    this.setMessage(MsgClientImpl);
+    this.setMessage(MsgClient);
   }
 }

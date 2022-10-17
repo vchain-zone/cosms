@@ -1,12 +1,12 @@
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
-  UploadResult,
+  UploadResult
 } from '@cosmjs/cosmwasm-stargate';
 import {
   DirectSecp256k1HdWallet,
   makeCosmoshubPath,
-  OfflineSigner,
+  OfflineSigner
 } from '@cosmjs/proto-signing';
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import {
@@ -14,7 +14,7 @@ import {
   GasPrice,
   SigningStargateClient,
   SigningStargateClientOptions,
-  StdFee,
+  StdFee
 } from '@cosmjs/stargate';
 
 import Cosm from '../cosm';
@@ -33,6 +33,14 @@ export interface WalletOptions {
 }
 
 export class Wallet {
+  get cosmWasmSigner(): SigningCosmWasmClient {
+    return this._cosmWasmSigner;
+  }
+
+  get stargateSigner(): SigningStargateClient {
+    return this._stargateSigner;
+  }
+
   private _signer: OfflineSigner;
   private _cosmWasmSigner: SigningCosmWasmClient;
   private _stargateSigner: SigningStargateClient;
@@ -43,11 +51,14 @@ export class Wallet {
     provider: Provider,
     mnemonic: string,
     prefix: string,
-    options?: WalletOptions
+    options: WalletOptions = {
+      cosmWasmOptions: {},
+      stargateOptions: {}
+    }
   ): Promise<Wallet> {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       hdPaths: [makeCosmoshubPath(0)],
-      prefix: prefix,
+      prefix: prefix
     });
     const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
       provider.rpcUrl,
@@ -85,7 +96,7 @@ export class Wallet {
     }
     const wallets = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       hdPaths: paths,
-      prefix: prefix,
+      prefix: prefix
     });
     const accounts = await wallets.getAccounts();
     const results = [];
@@ -164,7 +175,7 @@ export class Wallet {
     return await this._cosmWasmSigner.upload(this.address, wasmCode, fee, memo);
   }
 
-  public async deloyContractFromCodeId(codeId: number){
+  public async deloyContractFromCodeId(codeId: number) {
 
   }
 
