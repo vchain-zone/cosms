@@ -1,4 +1,5 @@
 import { StdFee } from '@cosmjs/amino';
+
 import { Provider } from '../providers';
 import {
   createProtobufRpcMessageClient,
