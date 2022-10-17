@@ -1,12 +1,22 @@
+import { StdFee } from '@cosmjs/amino';
 import { Provider } from '../providers';
+import {
+  createProtobufRpcMessageClient,
+  ProtobufRpcMessageClient
+} from '../queryclient/ProtobufRpcMessageClient';
 import {
   createProtobufRpcStateClient,
   ProtobufRpcStateClient
-} from '../queryclient/utils';
+} from '../queryclient/ProtobufRpcStateClient';
 import { Wallet } from '../wallet';
 
 export class App {
-  public prefixService: (prefix?: string) => this;
+  get messageRpc(): ProtobufRpcMessageClient {
+    if (!this._messageRpc) {
+      throw 'Must set wallet first';
+    }
+    return this._messageRpc;
+  }
 
   set wallet(value: Wallet) {
     this._wallet = value;
@@ -21,12 +31,15 @@ export class App {
 
   public message;
   public protobuf;
+  public messageProtobuf;
+  public queryProtobuf;
   public query;
 
   public block: (height?: number) => this;
 
   private provider: Provider;
   private readonly rpc: ProtobufRpcStateClient;
+  private _messageRpc: ProtobufRpcMessageClient;
   private _wallet: Wallet;
 
   constructor(provider: Provider) {
@@ -34,9 +47,14 @@ export class App {
     this.rpc = createProtobufRpcStateClient(
       this.provider.batchQueryClient.getQueryClient()
     );
+
     this.block = this.rpc.block;
-    this.prefixService = this.rpc.prefixService;
-    this.message = {};
+  }
+
+  prefixServices(prefix?: string) {
+    this.rpc.prefixService(prefix);
+    this.messageRpc.prefixService(prefix);
+    return this;
   }
 
   setQueryClient(QueryClientImpl: any) {
@@ -44,14 +62,33 @@ export class App {
   }
 
   setProtobuf(Protobuf: any) {
-    this.query = new Protobuf(this.rpc);
+    this.protobuf = Protobuf;
+  }
+
+  setMessageProtobuf(Protobuf: any) {
+    this.messageProtobuf = Protobuf;
+  }
+
+  setQueryProtobuf(Protobuf: any) {
+    this.queryProtobuf = Protobuf;
   }
 
   setMessage(Message: any) {
-    this.message = new Message(this.rpc);
+    this._messageRpc = createProtobufRpcMessageClient(
+      this.provider.batchQueryClient.getQueryClient(), Message
+    );
+    this.message = new Message.MsgClientImpl(this.messageRpc);
   }
 
   setWallet(wallet: Wallet) {
     this._wallet = wallet;
+  }
+
+  getCurrentMessage() {
+    return this._messageRpc.currentMessage();
+  }
+
+  sendMessage(fee: StdFee | 'auto' | number, memo?: string) {
+    return this.messageRpc.send(this.wallet, fee, memo);
   }
 }

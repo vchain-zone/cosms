@@ -17,8 +17,9 @@ import Cosm from './index';
 import { defaultSigningClientOptions, faucet } from './testutils.spec';
 
 // const rpcUrl = 'https://testnet.rpc.orai.io';
+const rpcUrl = 'https://rpc.orai.io';
 // const rpcUrl = "https://public-rpc1.stafihub.io";
-const rpcUrl = "https://rpc-cosmoshub.keplr.app";
+// const rpcUrl = "https://rpc-cosmoshub.keplr.app";
 // const rpcUrl = "https://rpc-osmosis.keplr.app";
 // const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
 let provider;
@@ -295,6 +296,12 @@ describe('Cosm test', async () => {
       let mint = cosm.cosmos.mint;
       let mintDenomParams = await mint.query.Params({});
       console.log(mintDenomParams.params);
+
+      // cosm.cosmos.bank.prefixServices("orai")
+      // let denoms = await cosm.cosmos.bank.query.DenomsMetadata({ denom: 'orai' });
+      // console.log(denoms);
+      // let denom = await cosm.cosmos.bank.query.DenomMetadata({ denom: 'orai' });
+      // console.log(denom);
     });
 
   });

@@ -1,3 +1,4 @@
+import * as  MsgClient from 'cosmjs-types/cosmos/crisis/v1beta1/tx';
 import { MsgClientImpl } from 'cosmjs-types/cosmos/crisis/v1beta1/tx';
 import { Provider } from '../providers';
 
@@ -8,6 +9,6 @@ export class Crisis extends App {
 
   constructor(provider: Provider) {
     super(provider);
-    this.setMessage(MsgClientImpl);
+    this.setMessage(MsgClient);
   }
 }

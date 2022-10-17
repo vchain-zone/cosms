@@ -1,6 +1,7 @@
 import { QueryClientImpl } from 'cosmjs-types/cosmos/staking/v1beta1/query';
 import * as StakingProtobuf from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import { BondStatus } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
+import * as MsgClient from 'cosmjs-types/cosmos/staking/v1beta1/tx';
 import { MsgClientImpl } from 'cosmjs-types/cosmos/staking/v1beta1/tx';
 
 import { Provider } from '../providers';
@@ -17,6 +18,6 @@ export class Staking extends App {
   constructor(provider: Provider) {
     super(provider);
     this.setQueryClient(QueryClientImpl);
-    this.setMessage(MsgClientImpl);
+    this.setMessage(MsgClient);
   }
 }
