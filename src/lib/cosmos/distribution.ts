@@ -12,7 +12,7 @@ import { App } from './app';
 
 export class Distribution extends App {
   public declare query: QueryClientImpl;
-  public message: MsgClientImpl;
+  public declare message: MsgClientImpl;
   public protobuf = Protobuf;
 
   constructor(provider: Provider) {
