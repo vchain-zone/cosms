@@ -28,7 +28,7 @@ export default class Cosmos {
   private app: App;
   private auth: Auth;
   private authz: Authz;
-  private bank: Bank;
+  public bank: Bank;
   private base: Base;
   public capability: Capability;
   public crisis: Crisis;
