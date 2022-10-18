@@ -1,6 +1,6 @@
 {
   "name": "@tovchain/cosms",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "query data form cosmos base networks template",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -34,13 +34,15 @@
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
     "reset-hard": "git clean -dfx && git reset --hard && yarn",
-    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
+    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish",
+    "prepack": "yarn build"
   },
   "engines": {
     "node": ">=10"
   },
   "dependencies": {
     "@bitauth/libauth": "^1.17.1",
+    "@cosmjs/cosmwasm-stargate": "^0.29.2",
     "@cosmjs/proto-signing": "^0.29.0",
     "@cosmjs/stargate": "^0.29.0",
     "cosmjs-types": "^0.5.1"

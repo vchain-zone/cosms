@@ -1,9 +1,9 @@
-import { provider } from '../providers';
+import { Provider } from '../providers';
 
 export class Wasm {
-  private provider: provider;
+  private provider: Provider;
 
-  constructor(provider: provider) {
+  constructor(provider: Provider) {
     this.provider = provider;
   }
 }
