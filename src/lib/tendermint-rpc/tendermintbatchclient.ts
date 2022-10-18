@@ -1,3 +1,13 @@
+import {
+  iavlSpec,
+  ics23,
+  tendermintSpec,
+  verifyExistence,
+  verifyNonExistence
+} from '@confio/ics23';
+import { toAscii, toHex } from '@cosmjs/encoding';
+import { ProvenQuery } from '@cosmjs/stargate/build/queryclient/queryclient';
+import { firstEvent } from '@cosmjs/stream';
 import { createJsonRpcRequest } from '@cosmjs/tendermint-rpc/build/jsonrpc';
 import {
   HttpClient,
@@ -5,18 +15,36 @@ import {
   instanceOfRpcStreamingClient,
   RpcClient,
   SubscriptionEvent,
-  WebsocketClient,
+  WebsocketClient
 } from '@cosmjs/tendermint-rpc/build/rpcclients';
+import * as tendermint34 from '@cosmjs/tendermint-rpc/build/tendermint34';
 import {
   adaptor35,
   Decoder,
   Encoder,
   Params,
-  Responses,
+  Responses
 } from '@cosmjs/tendermint-rpc/build/tendermint35/adaptor';
 import * as requests from '@cosmjs/tendermint-rpc/build/tendermint35/requests';
-import * as responses from '@cosmjs/tendermint-rpc/build/tendermint35/responses';
+import * as responses
+  from '@cosmjs/tendermint-rpc/build/tendermint35/responses';
+import {
+  arrayContentEquals,
+  assert,
+  assertDefined,
+  sleep
+} from '@cosmjs/utils';
 import { Stream } from 'xstream';
+
+function checkAndParseOp(op: tendermint34.ProofOp, kind: string, key: Uint8Array): ics23.CommitmentProof {
+  if (op.type !== kind) {
+    throw new Error(`Op expected to be ${kind}, got "${op.type}`);
+  }
+  if (!arrayContentEquals(key, op.key)) {
+    throw new Error(`Proven key different than queried key.\nQuery: ${toHex(key)}\nProven: ${toHex(op.key)}`);
+  }
+  return ics23.CommitmentProof.decode(op.data);
+}
 
 export class TendermintBatchClient {
   /**
@@ -88,7 +116,7 @@ export class TendermintBatchClient {
 
   public async abciInfo(): Promise<responses.AbciInfoResponse> {
     const query: requests.AbciInfoRequest = {
-      method: requests.Method.AbciInfo,
+      method: requests.Method.AbciInfo
     };
     return this.doCall(query, this.p.encodeAbciInfo, this.r.decodeAbciInfo);
   }
@@ -98,7 +126,7 @@ export class TendermintBatchClient {
   ): Promise<responses.AbciQueryResponse> {
     const query: requests.AbciQueryRequest = {
       params: params,
-      method: requests.Method.AbciQuery,
+      method: requests.Method.AbciQuery
     };
     return this.doCall(query, this.p.encodeAbciQuery, this.r.decodeAbciQuery);
   }
@@ -106,7 +134,7 @@ export class TendermintBatchClient {
   public async block(height?: number): Promise<responses.BlockResponse> {
     const query: requests.BlockRequest = {
       method: requests.Method.Block,
-      params: { height: height },
+      params: { height: height }
     };
     return this.doCall(query, this.p.encodeBlock, this.r.decodeBlock);
   }
@@ -116,7 +144,7 @@ export class TendermintBatchClient {
   ): Promise<responses.BlockResultsResponse> {
     const query: requests.BlockResultsRequest = {
       method: requests.Method.BlockResults,
-      params: { height: height },
+      params: { height: height }
     };
     return this.doCall(
       query,
@@ -138,7 +166,7 @@ export class TendermintBatchClient {
   ): Promise<responses.BlockSearchResponse> {
     const query: requests.BlockSearchRequest = {
       params: params,
-      method: requests.Method.BlockSearch,
+      method: requests.Method.BlockSearch
     };
     const resp = await this.doCall(
       query,
@@ -150,7 +178,7 @@ export class TendermintBatchClient {
       // make sure we sort by height, as tendermint may be sorting by string value of the height
       blocks: [...resp.blocks].sort(
         (a, b) => a.block.header.height - b.block.header.height
-      ),
+      )
     };
   }
 
@@ -181,7 +209,7 @@ export class TendermintBatchClient {
 
     return {
       totalCount: blocks.length,
-      blocks: blocks,
+      blocks: blocks
     };
   }
 
@@ -199,8 +227,8 @@ export class TendermintBatchClient {
       method: requests.Method.Blockchain,
       params: {
         minHeight: minHeight,
-        maxHeight: maxHeight,
-      },
+        maxHeight: maxHeight
+      }
     };
     return this.doCall(query, this.p.encodeBlockchain, this.r.decodeBlockchain);
   }
@@ -215,7 +243,7 @@ export class TendermintBatchClient {
   ): Promise<responses.BroadcastTxSyncResponse> {
     const query: requests.BroadcastTxRequest = {
       params: params,
-      method: requests.Method.BroadcastTxSync,
+      method: requests.Method.BroadcastTxSync
     };
     return this.doCall(
       query,
@@ -234,7 +262,7 @@ export class TendermintBatchClient {
   ): Promise<responses.BroadcastTxAsyncResponse> {
     const query: requests.BroadcastTxRequest = {
       params: params,
-      method: requests.Method.BroadcastTxAsync,
+      method: requests.Method.BroadcastTxAsync
     };
     return this.doCall(
       query,
@@ -253,7 +281,7 @@ export class TendermintBatchClient {
   ): Promise<responses.BroadcastTxCommitResponse> {
     const query: requests.BroadcastTxRequest = {
       params: params,
-      method: requests.Method.BroadcastTxCommit,
+      method: requests.Method.BroadcastTxCommit
     };
     return this.doCall(
       query,
@@ -265,7 +293,7 @@ export class TendermintBatchClient {
   public async commit(height?: number): Promise<responses.CommitResponse> {
     const query: requests.CommitRequest = {
       method: requests.Method.Commit,
-      params: { height: height },
+      params: { height: height }
     };
     return this.doCall(query, this.p.encodeCommit, this.r.decodeCommit);
   }
@@ -282,7 +310,7 @@ export class TendermintBatchClient {
 
   public async numUnconfirmedTxs(): Promise<responses.NumUnconfirmedTxsResponse> {
     const query: requests.NumUnconfirmedTxsRequest = {
-      method: requests.Method.NumUnconfirmedTxs,
+      method: requests.Method.NumUnconfirmedTxs
     };
     return this.doCall(
       query,
@@ -299,7 +327,7 @@ export class TendermintBatchClient {
   public subscribeNewBlock(): Stream<responses.NewBlockEvent> {
     const request: requests.SubscribeRequest = {
       method: requests.Method.Subscribe,
-      query: { type: requests.SubscriptionEventType.NewBlock },
+      query: { type: requests.SubscriptionEventType.NewBlock }
     };
     return this.subscribe(request, this.r.decodeNewBlockEvent);
   }
@@ -307,7 +335,7 @@ export class TendermintBatchClient {
   public subscribeNewBlockHeader(): Stream<responses.NewBlockHeaderEvent> {
     const request: requests.SubscribeRequest = {
       method: requests.Method.Subscribe,
-      query: { type: requests.SubscriptionEventType.NewBlockHeader },
+      query: { type: requests.SubscriptionEventType.NewBlockHeader }
     };
     return this.subscribe(request, this.r.decodeNewBlockHeaderEvent);
   }
@@ -317,8 +345,8 @@ export class TendermintBatchClient {
       method: requests.Method.Subscribe,
       query: {
         type: requests.SubscriptionEventType.Tx,
-        raw: query,
-      },
+        raw: query
+      }
     };
     return this.subscribe(request, this.r.decodeTxEvent);
   }
@@ -331,7 +359,7 @@ export class TendermintBatchClient {
   public async tx(params: requests.TxParams): Promise<responses.TxResponse> {
     const query: requests.TxRequest = {
       params: params,
-      method: requests.Method.Tx,
+      method: requests.Method.Tx
     };
     return this.doCall(query, this.p.encodeTx, this.r.decodeTx);
   }
@@ -346,7 +374,7 @@ export class TendermintBatchClient {
   ): Promise<responses.TxSearchResponse> {
     const query: requests.TxSearchRequest = {
       params: params,
-      method: requests.Method.TxSearch,
+      method: requests.Method.TxSearch
     };
     return this.doCall(query, this.p.encodeTxSearch, this.r.decodeTxSearch);
   }
@@ -372,7 +400,7 @@ export class TendermintBatchClient {
 
     return {
       totalCount: txs.length,
-      txs: txs,
+      txs: txs
     };
   }
 
@@ -381,7 +409,7 @@ export class TendermintBatchClient {
   ): Promise<responses.ValidatorsResponse> {
     const query: requests.ValidatorsRequest = {
       method: requests.Method.Validators,
-      params: params,
+      params: params
     };
     return this.doCall(query, this.p.encodeValidators, this.r.decodeValidators);
   }
@@ -398,7 +426,7 @@ export class TendermintBatchClient {
       const response = await this.validators({
         per_page: 50,
         height: blockHeight,
-        page: page,
+        page: page
       });
       validators.push(...response.validators);
       blockHeight = blockHeight || response.blockHeight;
@@ -414,15 +442,13 @@ export class TendermintBatchClient {
       blockHeight: blockHeight ?? 0,
       count: validators.length,
       total: validators.length,
-      validators: validators,
+      validators: validators
     };
   }
 
   // doCall is a helper to handle the encode/call/decode logic
-  private async doCall<
-    T extends requests.Request,
-    U extends responses.Response
-  >(request: T, encode: Encoder<T>, decode: Decoder<U>): Promise<U> {
+  private async doCall<T extends requests.Request,
+    U extends responses.Response>(request: T, encode: Encoder<T>, decode: Decoder<U>): Promise<U> {
     const req = encode(request);
     const result = await this.client.execute(req);
     return decode(result);
@@ -443,10 +469,148 @@ export class TendermintBatchClient {
     });
   }
 
-  public async doCallBatch<
-    T extends requests.Request,
-    U extends responses.Response
-  >(
+
+  public async queryVerified(store: string, key: Uint8Array, desiredHeight?: number): Promise<Uint8Array> {
+    const {
+      height,
+      proof,
+      value
+    } = await this.queryRawProof(store, key, desiredHeight);
+
+    const subProof = checkAndParseOp(proof.ops[0], 'ics23:iavl', key);
+    const storeProof = checkAndParseOp(proof.ops[1], 'ics23:simple', toAscii(store));
+
+    // this must always be existence, if the store is not a typo
+    assert(storeProof.exist);
+    assert(storeProof.exist.value);
+
+    // this may be exist or non-exist, depends on response
+    if (!value || value.length === 0) {
+      // non-existence check
+      assert(subProof.nonexist);
+      // the subproof must map the desired key to the "value" of the storeProof
+      verifyNonExistence(subProof.nonexist, iavlSpec, storeProof.exist.value, key);
+    } else {
+      // existence check
+      assert(subProof.exist);
+      assert(subProof.exist.value);
+      // the subproof must map the desired key to the "value" of the storeProof
+      verifyExistence(subProof.exist, iavlSpec, storeProof.exist.value, key, value);
+    }
+
+    // the store proof must map its declared value (root of subProof) to the appHash of the next block
+    const header = await this.getNextHeader(height);
+    verifyExistence(storeProof.exist, tendermintSpec, header.appHash, toAscii(store), storeProof.exist.value);
+
+    return value;
+  }
+
+  public async queryRawProof(
+    store: string,
+    queryKey: Uint8Array,
+    desiredHeight?: number
+  ): Promise<ProvenQuery> {
+    const { key, value, height, proof, code, log } = await this.abciQuery({
+      // we need the StoreKey for the module, not the module name
+      // https://github.com/cosmos/cosmos-sdk/blob/8cab43c8120fec5200c3459cbf4a92017bb6f287/x/auth/types/keys.go#L12
+      path: `/store/${store}/key`,
+      data: queryKey,
+      prove: true,
+      height: desiredHeight
+    });
+
+    if (code) {
+      throw new Error(`Query failed with (${code}): ${log}`);
+    }
+
+    if (!arrayContentEquals(queryKey, key)) {
+      throw new Error(`Response key ${toHex(key)} doesn't match query key ${toHex(queryKey)}`);
+    }
+
+    if (!height) {
+      throw new Error('No query height returned');
+    }
+    if (!proof || proof.ops.length !== 2) {
+      throw new Error(`Expected 2 proof ops, got ${proof?.ops.length ?? 0}. Are you using stargate?`);
+    }
+
+    // we don't need the results, but we can ensure the data is the proper format
+    checkAndParseOp(proof.ops[0], 'ics23:iavl', key);
+    checkAndParseOp(proof.ops[1], 'ics23:simple', toAscii(store));
+
+    return {
+      key: key,
+      value: value,
+      height: height,
+      // need to clone this: readonly input / writeable output
+      proof: {
+        ops: [...proof.ops]
+      }
+    };
+  }
+
+  public async queryUnverified(
+    path: string,
+    request: Uint8Array,
+    desiredHeight?: number
+  ): Promise<Uint8Array> {
+    const response = await this.abciQuery({
+      path: path,
+      data: request,
+      prove: false,
+      height: desiredHeight
+    });
+
+    if (response.code) {
+      throw new Error(`Query failed with (${response.code}): ${response.log}`);
+    }
+
+    return response.value;
+  }
+
+  // this must return the header for height+1
+  // throws an error if height is 0 or undefined
+  private async getNextHeader(height?: number): Promise<tendermint34.Header> {
+    assertDefined(height);
+    if (height === 0) {
+      throw new Error('Query returned height 0, cannot prove it');
+    }
+
+    const searchHeight = height + 1;
+    let nextHeader: tendermint34.Header | undefined;
+    let headersSubscription: Stream<tendermint34.NewBlockHeaderEvent> | undefined;
+    try {
+      headersSubscription = this.subscribeNewBlockHeader();
+    } catch {
+      // Ignore exception caused by non-WebSocket Tendermint clients
+    }
+
+    if (headersSubscription) {
+      const firstHeader = await firstEvent(headersSubscription);
+      // The first header we get might not be n+1 but n+2 or even higher. In such cases we fall back on a query.
+      if (firstHeader.height === searchHeight) {
+        nextHeader = firstHeader;
+      }
+    }
+
+    while (!nextHeader) {
+      // start from current height to avoid backend error for minHeight in the future
+      const correctHeader = (await this.blockchain(height, searchHeight)).blockMetas
+        .map((meta) => meta.header)
+        .find((h) => h.height === searchHeight);
+      if (correctHeader) {
+        nextHeader = correctHeader;
+      } else {
+        await sleep(1000);
+      }
+    }
+
+    assert(nextHeader.height === searchHeight, 'Got wrong header. This is a bug in the logic above.');
+    return nextHeader;
+  }
+
+  public async doCallBatch<T extends requests.Request,
+    U extends responses.Response>(
     requests: T[],
     encode: Encoder<T>,
     decode: Decoder<U>
