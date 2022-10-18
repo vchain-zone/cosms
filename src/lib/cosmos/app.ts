@@ -46,7 +46,7 @@ export class App {
   constructor(provider: Provider) {
     this.provider = provider;
     this.rpc = createProtobufRpcStateClient(
-      this.provider.batchQueryClient.getQueryClient()
+      this.provider.batchQueryClient
     );
 
     this.block = this.rpc.block;

@@ -1,4 +1,5 @@
 import { QueryClient } from '@cosmjs/stargate';
+import { BatchQueryClient } from './batchqueryclient';
 
 export interface ProtobufRpcStateClient {
   block(height?: number);
@@ -13,7 +14,7 @@ export interface ProtobufRpcStateClient {
 }
 
 export function createProtobufRpcStateClient(
-  base: QueryClient
+  base: QueryClient | BatchQueryClient
 ): ProtobufRpcStateClient {
   const self = {};
   return {
