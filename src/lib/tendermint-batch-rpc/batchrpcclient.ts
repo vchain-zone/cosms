@@ -9,6 +9,8 @@ import { RpcClient } from '@cosmjs/tendermint-rpc/build/rpcclients';
  * to each JSON-RPC request. But this is how subscriptions work in Tendermint.
  */
 export interface BatchRpcClient extends RpcClient {
-  readonly executeBatch: (requests: JsonRpcRequest[]) => Promise<JsonRpcSuccessResponse[]>;
+  readonly executeBatch: (
+    requests: JsonRpcRequest[]
+  ) => Promise<JsonRpcSuccessResponse[]>;
   readonly disconnect: () => void;
 }

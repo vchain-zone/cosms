@@ -111,8 +111,9 @@ export const defaultSigningClientOptions: SigningStargateClientOptions = {
 };
 
 export const defaultAccount = {
-  mnemonic:"river art invite misery warm input decorate marriage grace already cabbage scout churn cart country laptop supreme pipe divide metal path same replace gather"
-}
+  mnemonic:
+    'river art invite misery warm input decorate marriage grace already cabbage scout churn cart country laptop supreme pipe divide metal path same replace gather',
+};
 export const faucet = {
   mnemonic:
     'economy stock theory fatal elder harbor betray wasp final emotion task crumble siren bottom lizard educate guess current outdoor pair theory focus wife stone',

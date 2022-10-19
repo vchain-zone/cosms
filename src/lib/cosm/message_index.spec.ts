@@ -8,9 +8,9 @@ import 'mocha';
 import { BaseProvider } from '../providers';
 import { Wallet } from '../wallet';
 
-import Cosm from './index';
-
 import { defaultAccount, defaultSigningClientOptions } from './testutils.spec';
+
+import Cosm from './index';
 
 
 const rpcUrl = 'https://testnet.rpc.orai.io';
@@ -38,13 +38,15 @@ describe('Cosm test', async () => {
     await provider.connect(rpcUrl);
     cosm = new Cosm(provider);
 
-    wallet = await Wallet.getWalletFromMnemonic(provider, defaultAccount.mnemonic, prefix);
-
+    wallet = await Wallet.getWalletFromMnemonic(
+      provider,
+      defaultAccount.mnemonic,
+      prefix
+    );
 
     const registry = new Registry();
     registry.register('/custom.MsgCustom', MsgSend);
     const options = { ...defaultSigningClientOptions, registry: registry };
-
   });
   before('setup network info', async () => {
     currentBlock = await provider.batchQueryClient.getHeight();
@@ -65,40 +67,39 @@ describe('Cosm test', async () => {
   });
 
   describe('Test message', async () => {
-    it('should get account', async function() {
+    it('should get account', async function () {
       console.log(wallet.address);
-      let balance = await cosm.cosmos.bank.query.AllBalances({ address: wallet.address });
+      const balance = await cosm.cosmos.bank.query.AllBalances({
+        address: wallet.address,
+      });
       console.log(balance);
       console.log(delegation);
 
       cosm.setWallet(wallet);
 
-      let delegateInfo = {
+      const delegateInfo = {
         delegatorAddress: wallet.address,
         validatorAddress: delegation.validatorAddress,
-        amount: coin(100000, denom)
+        amount: coin(100000, denom),
       };
-
 
       await cosm.cosmos.staking.message.Delegate(delegateInfo);
 
-
-      let currentMessage = cosm.cosmos.staking.getCurrentMessage();
+      const currentMessage = cosm.cosmos.staking.getCurrentMessage();
       console.log(currentMessage);
 
       const fee = {
         amount: [
           {
             denom: 'orai',
-            amount: '2000'
-          }
+            amount: '2000',
+          },
         ],
-        gas: '180000' // 180k
+        gas: '180000', // 180k
       };
 
-      let tx = await cosm.cosmos.staking.sendMessage(fee);
+      const tx = await cosm.cosmos.staking.sendMessage(fee);
       console.log(tx);
     });
-
   });
 });

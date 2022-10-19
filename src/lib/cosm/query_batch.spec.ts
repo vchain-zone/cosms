@@ -19,14 +19,13 @@ describe('Cosm test', async () => {
   });
 
   describe('Test message', async () => {
-    it('should get account', async function() {
-      const tendermint = cosm.tendermint
-      for(let i = 8568000; i < 8568202; i++ ){
+    it('should get account', async function () {
+      const tendermint = cosm.tendermint;
+      for (let i = 8568000; i < 8568202; i++) {
         await tendermint.block(i);
       }
-      const txs = await tendermint.doCallBatch()
-      console.log(txs)
+      const txs = await tendermint.doCallBatch();
+      console.log(txs);
     });
-
   });
 });

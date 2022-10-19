@@ -2,23 +2,25 @@ import {
   isJsonRpcErrorResponse,
   JsonRpcRequest,
   JsonRpcSuccessResponse,
-  parseJsonRpcResponse
+  parseJsonRpcResponse,
 } from '@cosmjs/json-rpc';
 import {
   HttpClient,
-  HttpEndpoint
+  HttpEndpoint,
 } from '@cosmjs/tendermint-rpc/build/rpcclients';
 import { http } from '@cosmjs/tendermint-rpc/build/rpcclients/httpclient';
 
 export class BatchHttpClient extends HttpClient {
-  protected readonly url: string;
-  protected readonly headers: Record<string, string> | undefined;
+  protected readonly declare url: string;
+  protected readonly declare headers: Record<string, string> | undefined;
 
   public constructor(endpoint: string | HttpEndpoint) {
     super(endpoint);
   }
 
-  public async executeBatch(requests: JsonRpcRequest[]): Promise<JsonRpcSuccessResponse[]> {
+  public async executeBatch(
+    requests: JsonRpcRequest[]
+  ): Promise<JsonRpcSuccessResponse[]> {
     const responses = await http('POST', this.url, this.headers, requests);
     const parsedResponses = [];
     for (const response of responses) {

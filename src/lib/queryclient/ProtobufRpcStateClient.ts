@@ -1,4 +1,5 @@
 import { QueryClient } from '@cosmjs/stargate';
+
 import { BatchQueryClient } from './batchqueryclient';
 
 export interface ProtobufRpcStateClient {
@@ -32,14 +33,22 @@ export function createProtobufRpcStateClient(
       data: Uint8Array
     ): Promise<Uint8Array> => {
       if (self['prefixService']) {
-        let i = service.indexOf('.');
+        const i = service.indexOf('.');
         service = self['prefixService'] + service.slice(i, service.length);
       }
       const path = `/${service}/${method}`;
       const height = self['height'];
       self['height'] = undefined;
       // console.debug(` get ${path} at ${height}`);
-      return base.queryUnverified(path, data, height);
+      // return base.queryUnverified(path, data, height);
+      try {
+        let res = base.queryUnverified(path, data, height);
+        return res;
+      } catch (e) {
+        const f = new Uint8Array([]);
+        return new Promise((resolve) => resolve(f));
+      }
+
     }
   };
 }
