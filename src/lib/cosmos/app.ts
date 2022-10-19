@@ -3,11 +3,11 @@ import { StdFee } from '@cosmjs/amino';
 import { Provider } from '../providers';
 import {
   createProtobufRpcMessageClient,
-  ProtobufRpcMessageClient
+  ProtobufRpcMessageClient,
 } from '../queryclient/ProtobufRpcMessageClient';
 import {
   createProtobufRpcStateClient,
-  ProtobufRpcStateClient
+  ProtobufRpcStateClient,
 } from '../queryclient/ProtobufRpcStateClient';
 import { Wallet } from '../wallet';
 
@@ -47,9 +47,7 @@ export class App {
 
   constructor(provider: Provider) {
     this.provider = provider;
-    this.rpc = createProtobufRpcStateClient(
-      this.provider.batchQueryClient
-    );
+    this.rpc = createProtobufRpcStateClient(this.provider.batchQueryClient.getQueryClient());
 
     this.block = this.rpc.block;
   }
@@ -82,7 +80,8 @@ export class App {
 
   setMessage(Message: any) {
     this._messageRpc = createProtobufRpcMessageClient(
-      this.provider.batchQueryClient.getQueryClient(), Message
+      this.provider.batchQueryClient.getQueryClient(),
+      Message
     );
     this._messageRpc.prefixService(this._prefixServicesName);
     this.message = new Message.MsgClientImpl(this.messageRpc);

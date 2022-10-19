@@ -1,5 +1,6 @@
-import * as  MsgClient from 'cosmjs-types/cosmos/crisis/v1beta1/tx';
+import * as MsgClient from 'cosmjs-types/cosmos/crisis/v1beta1/tx';
 import { MsgClientImpl } from 'cosmjs-types/cosmos/crisis/v1beta1/tx';
+
 import { Provider } from '../providers';
 
 import { App } from './app';

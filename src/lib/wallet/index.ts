@@ -1,12 +1,12 @@
 import {
   SigningCosmWasmClient,
   SigningCosmWasmClientOptions,
-  UploadResult
+  UploadResult,
 } from '@cosmjs/cosmwasm-stargate';
 import {
   DirectSecp256k1HdWallet,
   makeCosmoshubPath,
-  OfflineSigner
+  OfflineSigner,
 } from '@cosmjs/proto-signing';
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import {
@@ -14,7 +14,7 @@ import {
   GasPrice,
   SigningStargateClient,
   SigningStargateClientOptions,
-  StdFee
+  StdFee,
 } from '@cosmjs/stargate';
 
 import Cosm from '../cosm';
@@ -53,12 +53,12 @@ export class Wallet {
     prefix: string,
     options: WalletOptions = {
       cosmWasmOptions: {},
-      stargateOptions: {}
+      stargateOptions: {},
     }
   ): Promise<Wallet> {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       hdPaths: [makeCosmoshubPath(0)],
-      prefix: prefix
+      prefix: prefix,
     });
     const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
       provider.rpcUrl,
@@ -96,7 +96,7 @@ export class Wallet {
     }
     const wallets = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       hdPaths: paths,
-      prefix: prefix
+      prefix: prefix,
     });
     const accounts = await wallets.getAccounts();
     const results = [];
@@ -170,14 +170,16 @@ export class Wallet {
     this._denom = denom;
   }
 
-  public async uploadWasm(wasmCode: Uint8Array, fee?: StdFee, memo?: string): Promise<UploadResult> {
+  public async uploadWasm(
+    wasmCode: Uint8Array,
+    fee?: StdFee,
+    memo?: string
+  ): Promise<UploadResult> {
     fee = fee == null ? this.getFee(defaultUploadGas, defaultGasPrice) : fee;
     return await this._cosmWasmSigner.upload(this.address, wasmCode, fee, memo);
   }
 
-  public async deloyContractFromCodeId(codeId: number) {
-
-  }
+  public async deloyContractFromCodeId(codeId: number) {}
 
   public getFee(gas: number, gasPrice: number): StdFee {
     return calculateFee(

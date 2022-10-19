@@ -1,5 +1,6 @@
 import Cosm from '../cosm';
 import { BaseProvider } from '../providers';
+
 import APRCalculator from './index';
 
 async function test() {
@@ -7,26 +8,25 @@ async function test() {
   // let rpc = 'https://rpc.orai.io';
   // let rpc2 = 'https://rpc.cosmos.directory/cosmoshub';
   // let rpc = 'https://osmosis-rpc.polkachu.com';
-  let rpc = 'https://sifchain-rpc.polkachu.com';
+  const rpc = 'https://sifchain-rpc.polkachu.com';
   // let rpc3 = "https://rpc.cosmos.directory/juno"
   // let rpc3 = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
-  let provider = new BaseProvider();
+  const provider = new BaseProvider();
 
   await provider.connect(rpc);
 
-  let cosm = new Cosm(provider);
+  const cosm = new Cosm(provider);
   // cosm.cosmos.mint.prefixServices("osmosis");
-  let annualProvisions = await cosm.cosmos.mint.query.AnnualProvisions({});
+  const annualProvisions = await cosm.cosmos.mint.query.AnnualProvisions({});
 
   // cosm.cosmos.distribution.prefixServices("osmosis");
   // cosm.cosmos.distribution.prefixServices("osmosis");
-  let APR = new APRCalculator(cosm.cosmos, provider);
+  const APR = new APRCalculator(cosm.cosmos, provider);
   // let denominator = await cosm.cosmos.mint.query.Params({})
   // console.log(denominator)
   // let estBlockPerYear = (await cosm.cosmos.mint.query.Params({})).params.blocksPerYear.toNumber();
 
-
-  let validatorAddress = 'cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en';
+  const validatorAddress = 'cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en';
   // let height = await cosm.provider.batchQueryClient.getHeight();
   // console.log('height: ', height);
   // let blockNow = await cosm.provider.batchQueryClient.getBlock(height);
@@ -81,9 +81,12 @@ async function test() {
 
 test();
 
-function uint8ArrayStringToNumber(x: Uint8Array | string, decimal: number): number {
+function uint8ArrayStringToNumber(
+  x: Uint8Array | string,
+  decimal: number
+): number {
   let xStr = Buffer.from(x).toString();
-  let xlen = xStr.length;
+  const xlen = xStr.length;
   if (xlen < decimal) {
     xStr = '.' + '0'.repeat(decimal - xlen) + xStr;
   } else if (xlen === decimal) {
