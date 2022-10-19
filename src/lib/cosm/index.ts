@@ -1,4 +1,5 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
+import APRCalCulator from '../apr';
 import Cosmos from '../cosmos';
 import { Provider } from '../providers';
 import { Utils } from '../utils';
@@ -26,12 +27,13 @@ export default class Cosm {
   utils: Utils;
   cosmos: Cosmos;
   wasm: Wasm;
-
+  calculator: APRCalCulator;
   constructor(provider: Provider) {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
     this.wasm = new Wasm(provider);
     this.utils = new Utils();
+    this.calculator = new APRCalCulator(this.cosmos, provider);
   }
 
 
