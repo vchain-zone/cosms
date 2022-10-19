@@ -1,8 +1,11 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
 
+import APRCalCulator from '../apr';
 import Cosmos from '../cosmos';
 import { Provider } from '../providers';
-import { TendermintBatchClient } from '../tendermint-batch-rpc/tendermintbatchclient';
+import {
+  TendermintBatchClient
+} from '../tendermint-batch-rpc/tendermintbatchclient';
 import { Utils } from '../utils';
 import { Wallet } from '../wallet';
 import { Wasm } from '../wasm';
@@ -30,12 +33,15 @@ export default class Cosm {
   wasm: Wasm;
   tendermint: TendermintBatchClient;
 
+  calculator: APRCalCulator;
+
   constructor(provider: Provider) {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
     this.wasm = new Wasm(provider);
     this.tendermint = provider.tendermintClient;
     this.utils = new Utils();
+    this.calculator = new APRCalCulator(this.cosmos, provider);
   }
 
   setWallet(wallet: Wallet) {
