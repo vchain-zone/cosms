@@ -8,6 +8,11 @@ export default class APRCalCulator {
     this.cosmos = cosmos;
     this.provider = provider;
   }
+  /**
+   * STAKING_APR = [INFLATION*(1-COMMUNITY_TAX)/BONDED_TOKENS_RATIO]
+   * @param decimal mint decimal
+   * @returns Staking APR theoretically
+   */
   async stakingAPR(decimal: number): Promise<number> {
     const inflation = await this.inflation(decimal);
     const communityTax = await this.communityTax(decimal);
@@ -18,11 +23,24 @@ export default class APRCalCulator {
     const annualProvisions = await this.cosmos.mint.query.AnnualProvisions({});
     return uint8ArrayStringToNumber(annualProvisions.annualProvisions, decimal);
   }
+  /**
+   * ACTUAL_STAKING_APR = STAKING_APR*[ACTUAL_ANNUAL_PROVISION/ANNUAL_PROVISION]
+   * @param decimal mint decimal
+   * @returns actual staking APR 
+   */
   async actualStakingAPR(decimal: number): Promise<number> {
     const stakingAPR = await this.stakingAPR(decimal);
     const actualProvisionsRatio = await this.actualProvisionsRatio();
     return stakingAPR * actualProvisionsRatio;
   }
+  /**
+   * FINAL_STAKING_APR = ACTUAL_STAKING_APR*(1-VALIDATOR'S_COMMISSION)
+   * @note This function calculate staking apr for each validator's commission
+   * @param validatorAddress address of validator
+   * @param mintDecimal mint decimal
+   * @param distributionDecimal distribution decimal
+   * @returns actual staking apr if delegate to validator that have validator'commistion
+   */
   async finalStakingAPR(
     validatorAddress: string,
     mintDecimal: number,
