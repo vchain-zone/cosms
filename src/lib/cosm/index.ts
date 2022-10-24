@@ -31,7 +31,7 @@ export default class Cosm {
   constructor(provider: provider) {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
-    this.wasm = new Wasm(provider);
+    // this.wasm = new Wasm(provider);
     this.utils = new Utils();
   }
 
@@ -40,11 +40,11 @@ export default class Cosm {
     options?: SigningStargateClientOptions
   ) {
     this.offlineSinger = offlineSigner;
-    this._wallet = await Wallet.connectWithSigner(
-      this._provider.rpcUrl,
-      offlineSigner,
-      options
-    );
+    // this._wallet = await Wallet.connectWithSigner(
+    //   this._provider.rpcUrl,
+    //   offlineSigner,
+    //   options
+    // );
   }
 
   async setWallet(wallet: Wallet) {
