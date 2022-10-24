@@ -24,19 +24,18 @@ export class Wallet {
     private _signer: OfflineSigner;
     private _cosmWasmSigner: SigningCosmWasmClient;
     private _stargateSigner: SigningStargateClient;
+    private _provider: provider;
     private _account: AccountData;
-    private _denom: string;
 
     public static async getWalletFromMnemonic(
         provider: provider,
         mnemonic: string,
-        prefix: string,
-        denom: string,
         options?: WalletOptions
     ): Promise<Wallet> {
+        checkProvider(provider);
         const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
             hdPaths: [makeCosmoshubPath(0)],
-            prefix: prefix,
+            prefix: provider.bech32Prefix,
         });
         let cosmWasmClient, stargateClient;
         if (options != undefined) {
@@ -61,17 +60,16 @@ export class Wallet {
             );
         }
         const [account] = await wallet.getAccounts();
-        return new Wallet(wallet, account, cosmWasmClient, stargateClient, denom);
+        return new Wallet(provider, wallet, account, cosmWasmClient, stargateClient);
     }
 
     public static async getWalletsFromMnemonic(
         provider: provider,
         mnemonic: string,
-        prefix: string,
-        denom: string,
         amount: number,
         options?: WalletOptions
     ): Promise<Wallet[]> {
+        checkProvider(provider);
         const paths = [];
         if (amount <= 1) {
             throw 'Amount must be greater than one';
@@ -81,7 +79,7 @@ export class Wallet {
         }
         const wallets = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
             hdPaths: paths,
-            prefix: prefix,
+            prefix: provider.bech32Prefix,
         });
         const accounts = await wallets.getAccounts();
         const results = [];
@@ -109,7 +107,7 @@ export class Wallet {
                 );
             }
             results.push(
-                new Wallet(wallets, accounts[i], cosmWasmClient, stargateClient, denom)
+                new Wallet(provider, wallets, accounts[i], cosmWasmClient, stargateClient)
             );
         }
         return results;
@@ -118,9 +116,9 @@ export class Wallet {
     public static async getWalletsFromOfflineSigner(
         provider: provider,
         signer: OfflineSigner,
-        denom: string,
         options?: WalletOptions
     ): Promise<Wallet[]> {
+        checkProvider(provider);
         const results = [];
         const accounts = await signer.getAccounts();
         for (let i = 0; i < accounts.length; i++) {
@@ -147,24 +145,24 @@ export class Wallet {
                 );
             }
             results.push(
-                new Wallet(signer, accounts[i], cosmWasmClient, stargateClient, denom)
+                new Wallet(provider, signer, accounts[i], cosmWasmClient, stargateClient)
             );
         }
         return results;
     }
 
     private constructor(
+        provider: provider,
         signer: OfflineSigner,
         account: AccountData,
         cosmWasmSigner: SigningCosmWasmClient,
-        stargateSigner: SigningStargateClient,
-        denom: string
+        stargateSigner: SigningStargateClient
     ) {
+        this._provider = provider;
         this._signer = signer;
         this._account = account;
         this._cosmWasmSigner = cosmWasmSigner;
         this._stargateSigner = stargateSigner;
-        this._denom = denom;
     }
 
     get address(): string {
@@ -172,7 +170,11 @@ export class Wallet {
     }
 
     get denom(): string {
-        return this._denom;
+        return this._provider.feeToken;
+    }
+
+    get provider(): provider {
+        return this._provider;
     }
 
     get signer(): OfflineSigner {
@@ -185,5 +187,11 @@ export class Wallet {
 
     get stargateSigner(): SigningStargateClient {
         return this._stargateSigner;
+    }
+}
+
+const checkProvider = (provider: provider) => {
+    if (provider.bech32Prefix == undefined || provider.feeToken == undefined) {
+        throw "Require set bech32Prefix and feeToken for Provider";
     }
 }

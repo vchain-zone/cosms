@@ -1,16 +1,16 @@
 import {
-  ExecuteInstruction,
-  ExecuteResult,
-  InstantiateOptions as InitOptions,
-  InstantiateResult,
-  JsonObject,
-  MigrateResult,
-  UploadResult,
+    ExecuteInstruction,
+    ExecuteResult,
+    InstantiateOptions,
+    InstantiateResult,
+    JsonObject,
+    MigrateResult,
+    UploadResult,
 } from '@cosmjs/cosmwasm-stargate';
 import {
-    Coin as OriginalCoin,
-    OfflineSigner as Signer,
-  } from '@cosmjs/proto-signing';
+    Coin,
+    OfflineSigner,
+} from '@cosmjs/proto-signing';
 import { calculateFee, GasPrice, StdFee } from '@cosmjs/stargate';
 
 import { Wallet } from '../wallet';
@@ -20,159 +20,150 @@ const defaultInitGas = 1000000;
 const defaultExecGas = 500000;
 const defaultGasPrice = 0.25;
 
-export type OfflineSigner = Signer;
-// export type InstantiateOptions = InitOptions;
-export type Coin = OriginalCoin;
-
-export interface InstantiateOptions {
-  readonly funds?: readonly Coin[];
-  readonly admin?: string;
+export {
+    Coin,
+    OfflineSigner,
+    InstantiateOptions
 }
 export interface InstantiateMessage {
-  readonly codeId: number;
-  readonly instantiateMsg: JsonObject;
-  readonly label: string;
-  readonly options?: InstantiateOptions;
+    readonly codeId: number;
+    readonly instantiateMsg: JsonObject;
+    readonly label: string;
+    readonly options?: InstantiateOptions;
 }
 
 export interface ExecuteMessage {
-  readonly contractAddr: string;
-  readonly executeMsg: JsonObject;
-  readonly funds?: readonly Coin[];
+    readonly contractAddr: string;
+    readonly executeMsg: JsonObject;
+    readonly funds?: readonly Coin[];
 }
 
 export interface MigrateMessage {
-  readonly contractAddr: string;
-  readonly codeId: number;
-  readonly migrateMsg: JsonObject;
+    readonly contractAddr: string;
+    readonly migrateMsg: JsonObject;
+    readonly codeId: number;
 }
 export interface QueryMessage {
-  readonly contractAddr: string;
-  readonly queryMsg: JsonObject;
+    readonly contractAddr: string;
+    readonly queryMsg: JsonObject;
 }
 
 export class Wasm {
-  private wallet: Wallet;
+    private wallet: Wallet;
 
-  constructor(wallet: Wallet) {
-    this.wallet = wallet;
-  }
-
-  public async uploadWasm(
-    wasmCode: Uint8Array,
-    uploadFee?: StdFee,
-    memo?: string
-  ): Promise<UploadResult> {
-    uploadFee =
-      uploadFee == null
-        ? this.getFee(defaultUploadGas, defaultGasPrice)
-        : uploadFee;
-    return await this.wallet.cosmWasmSigner.upload(
-      this.wallet.address,
-      wasmCode,
-      uploadFee,
-      memo
-    );
-  }
-
-  public async initContract(
-    instantiateMessage: InstantiateMessage,
-    memo?: string,
-    initFee?: StdFee
-  ): Promise<InstantiateResult> {
-    initFee =
-      initFee == null ? this.getFee(defaultInitGas, defaultGasPrice) : initFee;
-    const initOptions: InitOptions = {
-      memo: memo,
-      funds: instantiateMessage.options.funds,
-      admin: instantiateMessage.options.admin,
-    };
-    return await this.wallet.cosmWasmSigner.instantiate(
-      this.wallet.address,
-      instantiateMessage.codeId,
-      instantiateMessage.instantiateMsg,
-      instantiateMessage.label,
-      initFee,
-      initOptions
-    );
-  }
-
-  public async execute(
-    executeMessage: ExecuteMessage,
-    memo?: string,
-    executeFee?: StdFee
-  ): Promise<ExecuteResult> {
-    executeFee =
-      executeFee == null
-        ? this.getFee(defaultExecGas, defaultGasPrice)
-        : executeFee;
-    return await this.wallet.cosmWasmSigner.execute(
-      this.wallet.address,
-      executeMessage.contractAddr,
-      executeMessage.executeMsg,
-      executeFee,
-      memo,
-      executeMessage.funds
-    );
-  }
-
-  public async executeMultiple(
-    executeMessages: ExecuteMessage[],
-    memo?: string,
-    executeFee?: StdFee
-  ): Promise<ExecuteResult> {
-    executeFee =
-      executeFee == null
-        ? this.getFee(defaultExecGas, defaultGasPrice)
-        : executeFee;
-
-    let executeInstructions: ExecuteInstruction[];
-    for (let i = 0; i < executeMessages.length; i++) {
-      const item: ExecuteInstruction = {
-        contractAddress: executeMessages[i].contractAddr,
-        msg: executeMessages[i].executeMsg,
-        funds: executeMessages[i].funds,
-      };
-      executeInstructions.push(item);
+    constructor(wallet: Wallet) {
+        this.wallet = wallet;
     }
-    return await this.wallet.cosmWasmSigner.executeMultiple(
-      this.wallet.address,
-      executeInstructions,
-      executeFee,
-      memo
-    );
-  }
 
-  public async migrate(
-    migrateMessage: MigrateMessage,
-    memo?: string,
-    migrateFee?: StdFee
-  ): Promise<MigrateResult> {
-    migrateFee =
-      migrateFee == null
-        ? this.getFee(defaultExecGas, defaultGasPrice)
-        : migrateFee;
-    return await this.wallet.cosmWasmSigner.migrate(
-      this.wallet.address,
-      migrateMessage.contractAddr,
-      migrateMessage.codeId,
-      migrateMessage.migrateMsg,
-      migrateFee,
-      memo
-    );
-  }
+    public async uploadWasm(
+        wasmCode: Uint8Array,
+        uploadFee?: StdFee,
+        memo?: string
+    ): Promise<UploadResult> {
+        uploadFee =
+            uploadFee == null
+                ? this.getFee(defaultUploadGas, defaultGasPrice)
+                : uploadFee;
+        return await this.wallet.cosmWasmSigner.upload(
+            this.wallet.address,
+            wasmCode,
+            uploadFee,
+            memo
+        );
+    }
 
-  public async query(queryMessage: QueryMessage): Promise<JsonObject> {
-    return await this.wallet.cosmWasmSigner.queryContractSmart(
-      queryMessage.contractAddr,
-      queryMessage.queryMsg
-    );
-  }
+    public async initContract(
+        instantiateMessage: InstantiateMessage,
+        initFee?: StdFee
+    ): Promise<InstantiateResult> {
+        initFee =
+            initFee == null ? this.getFee(defaultInitGas, defaultGasPrice) : initFee;
+        return await this.wallet.cosmWasmSigner.instantiate(
+            this.wallet.address,
+            instantiateMessage.codeId,
+            instantiateMessage.instantiateMsg,
+            instantiateMessage.label,
+            initFee,
+            instantiateMessage.options
+        );
+    }
 
-  public getFee(gas: number, gasPrice: number): StdFee {
-    return calculateFee(
-      gas,
-      GasPrice.fromString(gasPrice.toString() + this.wallet.denom)
-    );
-  }
+    public async execute(
+        executeMessage: ExecuteMessage,
+        memo?: string,
+        executeFee?: StdFee
+    ): Promise<ExecuteResult> {
+        executeFee =
+            executeFee == null
+                ? this.getFee(defaultExecGas, defaultGasPrice)
+                : executeFee;
+        return await this.wallet.cosmWasmSigner.execute(
+            this.wallet.address,
+            executeMessage.contractAddr,
+            executeMessage.executeMsg,
+            executeFee,
+            memo,
+            executeMessage.funds
+        );
+    }
+
+    public async executeMultiple(
+        executeMessages: ExecuteMessage[],
+        memo?: string,
+        executeFee?: StdFee
+    ): Promise<ExecuteResult> {
+        executeFee =
+            executeFee == null
+                ? this.getFee(defaultExecGas, defaultGasPrice)
+                : executeFee;
+
+        let executeInstructions: ExecuteInstruction[];
+        for (let i = 0; i < executeMessages.length; i++) {
+            const item: ExecuteInstruction = {
+                contractAddress: executeMessages[i].contractAddr,
+                msg: executeMessages[i].executeMsg,
+                funds: executeMessages[i].funds,
+            };
+            executeInstructions.push(item);
+        }
+        return await this.wallet.cosmWasmSigner.executeMultiple(
+            this.wallet.address,
+            executeInstructions,
+            executeFee,
+            memo
+        );
+    }
+
+    public async migrate(
+        migrateMessage: MigrateMessage,
+        memo?: string,
+        migrateFee?: StdFee
+    ): Promise<MigrateResult> {
+        migrateFee =
+            migrateFee == null
+                ? this.getFee(defaultExecGas, defaultGasPrice)
+                : migrateFee;
+        return await this.wallet.cosmWasmSigner.migrate(
+            this.wallet.address,
+            migrateMessage.contractAddr,
+            migrateMessage.codeId,
+            migrateMessage.migrateMsg,
+            migrateFee,
+            memo
+        );
+    }
+
+    public async query(queryMessage: QueryMessage): Promise<JsonObject> {
+        return await this.wallet.cosmWasmSigner.queryContractSmart(
+            queryMessage.contractAddr,
+            queryMessage.queryMsg
+        );
+    }
+
+    public getFee(gas: number, gasPrice: number): StdFee {
+        return calculateFee(
+            gas,
+            GasPrice.fromString(gasPrice.toString() + this.wallet.provider.feeToken)
+        );
+    }
 }

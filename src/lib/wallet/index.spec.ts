@@ -1,10 +1,11 @@
+import { expect } from 'chai';
 import * as dotenv from 'dotenv';
 
 import { BaseProvider } from '../providers';
 
 import { Wallet } from '.';
 import 'mocha';
-import { expect } from 'chai';
+
 dotenv.config();
 
 // const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
@@ -18,33 +19,42 @@ let wallets: Wallet[];
 
 describe('Test wallet', async () => {
     before('Setup', async () => {
-        provider = new BaseProvider();
-        await provider.connect(RPC_URL);
-        wallet = await Wallet.getWalletFromMnemonic(provider, MNEMONIC, PREFIX, DENOM);
+        provider = await BaseProvider.fromRpcUrl(RPC_URL);
+        provider.bech32Prefix = PREFIX;
+        provider.feeToken = DENOM;
     });
 
     it('Test getWalletFromMnemonic()', async () => {
-        wallet = await Wallet.getWalletFromMnemonic(provider, MNEMONIC, PREFIX, DENOM);
-
+        wallet = await Wallet.getWalletFromMnemonic(provider, MNEMONIC);
         expect(wallet.address.startsWith(PREFIX)).to.be.true;
         expect(wallet.denom).to.be.equal(DENOM);
     });
 
     it("Test getWalletsFromMnemonic()", async () => {
-        wallets = await Wallet.getWalletsFromMnemonic(provider, MNEMONIC, PREFIX, DENOM, 10);
+        wallets = await Wallet.getWalletsFromMnemonic(provider, MNEMONIC, 10);
         for (let i = 0; i < wallets.length; i++) {
-            let wallet = wallets[i];
+            const wallet = wallets[i];
             expect(wallet.address.startsWith(PREFIX)).to.be.true;
             expect(wallet.denom).to.be.equal(DENOM);
         }
     });
 
     it("Test getWalletsFromOfflineSigner()", async () => {
-        wallet = await Wallet.getWalletFromMnemonic(provider, MNEMONIC, PREFIX, DENOM);
+        wallet = await Wallet.getWalletFromMnemonic(provider, MNEMONIC);
         const signer = wallet.signer;
-        wallets = await Wallet.getWalletsFromOfflineSigner(provider, signer, DENOM);
+        wallets = await Wallet.getWalletsFromOfflineSigner(provider, signer);
         expect(wallets.length).to.be.equal(1);
         expect(wallets[0].address.startsWith(PREFIX)).to.be.true;
         expect(wallets[0].denom).to.be.equal(DENOM);
     });
+
+    it("Test wallet provider", async () => {
+        wallet = await Wallet.getWalletFromMnemonic(provider, MNEMONIC);
+        wallet.provider.bech32Prefix = "TEST";
+        expect(wallet.provider.bech32Prefix).to.be.equal("TEST");
+        wallet.provider.bech32Prefix = PREFIX;
+        wallet.provider.feeToken = "TEST";
+        expect(wallet.provider.feeToken).to.be.equal("TEST");
+        wallet.provider.feeToken = DENOM;
+    })
 });
