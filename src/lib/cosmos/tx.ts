@@ -1,9 +1,9 @@
-import { provider } from '../providers';
+import { Provider } from '../providers';
 
 import { App } from './app';
 
 export class Tx extends App {
-  constructor(provider: provider) {
+  constructor(provider: Provider) {
     super(provider);
   }
 }

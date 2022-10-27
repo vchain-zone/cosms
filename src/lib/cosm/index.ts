@@ -1,7 +1,11 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import { SigningStargateClientOptions } from '@cosmjs/stargate/build/signingstargateclient';
+
+import APRCalCulator from '../apr';
 import Cosmos from '../cosmos';
-import { provider } from '../providers';
+import { Provider } from '../providers';
+import {
+  TendermintBatchClient
+} from '../tendermint-batch-rpc/tendermintbatchclient';
 import { Utils } from '../utils';
 import { Wallet } from '../wallet';
 import { Wasm } from '../wasm';
@@ -19,36 +23,31 @@ export default class Cosm {
   private offlineSinger: OfflineSigner;
   private _wallet: Wallet;
 
-  get provider(): provider {
+  get provider(): Provider {
     return this._provider;
   }
 
-  private _provider: provider;
+  private _provider: Provider;
   utils: Utils;
   cosmos: Cosmos;
   wasm: Wasm;
+  tendermint: TendermintBatchClient;
 
-  constructor(provider: provider) {
+  calculator: APRCalCulator;
+
+  constructor(provider: Provider) {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
     // this.wasm = new Wasm(provider);
+    this.wasm = new Wasm(provider);
+    this.tendermint = provider.tendermintClient;
     this.utils = new Utils();
-  }
-
-  async setSigner(
-    offlineSigner: OfflineSigner,
-    options?: SigningStargateClientOptions
-  ) {
-    this.offlineSinger = offlineSigner;
-    // this._wallet = await Wallet.connectWithSigner(
-    //   this._provider.rpcUrl,
-    //   offlineSigner,
-    //   options
-    // );
+    this.calculator = new APRCalCulator(this.cosmos, provider);
   }
 
   async setWallet(wallet: Wallet) {
     this._wallet = wallet;
+    this.cosmos.setWallet(wallet);
   }
 
   static readonly version: string = version;

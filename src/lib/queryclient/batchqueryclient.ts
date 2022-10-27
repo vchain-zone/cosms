@@ -1,15 +1,18 @@
 import {
   AuthExtension,
   BankExtension,
-  QueryClient,
   StakingExtension,
   StargateClientOptions,
   TxExtension,
 } from '@cosmjs/stargate';
+import {
+  ProvenQuery,
+  QueryClient,
+} from '@cosmjs/stargate/build/queryclient/queryclient';
 import { StargateClient } from '@cosmjs/stargate/build/stargateclient';
 import { HttpEndpoint, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 
-import { TendermintBatchClient } from '../tendermint-rpc/tendermintbatchclient';
+import { TendermintBatchClient } from '../tendermint-batch-rpc/tendermintbatchclient';
 
 export class BatchQueryClient extends StargateClient {
   get tmBatchClient(): TendermintBatchClient {
@@ -44,5 +47,29 @@ export class BatchQueryClient extends StargateClient {
         TxExtension)
     | undefined {
     return super.getQueryClient();
+  }
+
+  public async queryVerified(
+    store: string,
+    key: Uint8Array,
+    desiredHeight?: number
+  ): Promise<Uint8Array> {
+    return this._tmBatchClient.queryVerified(store, key, desiredHeight);
+  }
+
+  public async queryRawProof(
+    store: string,
+    queryKey: Uint8Array,
+    desiredHeight?: number
+  ): Promise<ProvenQuery> {
+    return this._tmBatchClient.queryRawProof(store, queryKey, desiredHeight);
+  }
+
+  public async queryUnverified(
+    path: string,
+    request: Uint8Array,
+    desiredHeight?: number
+  ): Promise<Uint8Array> {
+    return this._tmBatchClient.queryUnverified(path, request, desiredHeight);
   }
 }
