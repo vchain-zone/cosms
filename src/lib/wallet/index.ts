@@ -27,6 +27,7 @@ export class Wallet {
     private _stargateSigner: SigningStargateClient;
     private _provider: Provider;
     private _account: AccountData;
+    private readonly _isWallet: boolean;
 
     public static async getWalletFromMnemonic(
         provider: Provider,
@@ -167,8 +168,17 @@ export class Wallet {
         this._account = account;
         this._cosmWasmSigner = cosmWasmSigner;
         this._stargateSigner = stargateSigner;
+        this._isWallet = true;
     }
 
+    public async getBalance(denom: string):Promise<Coin> {
+        return await this.cosmWasmSigner.getBalance(this.address, denom);
+    }
+
+    get isWallet(): boolean {
+        return this._isWallet;
+    }
+    
     get address(): string {
         return this._account.address;
     }
