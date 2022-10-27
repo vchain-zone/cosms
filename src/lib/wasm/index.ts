@@ -114,7 +114,7 @@ export class Wasm extends StaticWasm {
         return new Wasm(wallet);
     }
 
-    public static async connect(provider: Provider): Promise<StaticWasm> {
+    public static connect(provider: Provider): StaticWasm {
         return new StaticWasm(provider);
     }
 
