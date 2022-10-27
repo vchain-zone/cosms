@@ -7,11 +7,13 @@ import {
     MigrateResult,
     UploadResult,
 } from '@cosmjs/cosmwasm-stargate';
+import { Coin, OfflineSigner } from '@cosmjs/proto-signing';
 import {
-    Coin,
-    OfflineSigner,
-} from '@cosmjs/proto-signing';
-import { calculateFee, GasPrice, StdFee } from '@cosmjs/stargate';
+    calculateFee,
+    DeliverTxResponse,
+    GasPrice,
+    StdFee,
+} from '@cosmjs/stargate';
 
 import { Wallet } from '../wallet';
 
@@ -20,11 +22,7 @@ const defaultInitGas = 1000000;
 const defaultExecGas = 500000;
 const defaultGasPrice = 0.25;
 
-export {
-    Coin,
-    OfflineSigner,
-    InstantiateOptions
-}
+export { Coin, OfflineSigner, InstantiateOptions };
 export interface InstantiateMessage {
     readonly codeId: number;
     readonly instantiateMsg: JsonObject;
@@ -46,6 +44,21 @@ export interface MigrateMessage {
 export interface QueryMessage {
     readonly contractAddr: string;
     readonly queryMsg: JsonObject;
+}
+
+export interface SendMessage {
+    readonly recipient: string;
+    readonly coins: readonly Coin[];
+}
+
+export interface DelegateMessage {
+    readonly validator: string;
+    readonly coin: Coin;
+}
+
+export interface UndelegateMessage {
+    readonly validator: string;
+    readonly coin: Coin;
 }
 
 export class Wasm {
@@ -157,6 +170,77 @@ export class Wasm {
         return await this.wallet.cosmWasmSigner.queryContractSmart(
             queryMessage.contractAddr,
             queryMessage.queryMsg
+        );
+    }
+
+    public async send(
+        sendMessage: SendMessage,
+        memo?: string,
+        sendFee?: StdFee
+    ): Promise<DeliverTxResponse> {
+        sendFee =
+            sendFee == null ? this.getFee(defaultExecGas, defaultGasPrice) : sendFee;
+        return await this.wallet.stargateSigner.sendTokens(
+            this.wallet.address,
+            sendMessage.recipient,
+            sendMessage.coins,
+            sendFee,
+            memo
+        );
+    }
+
+    public async delegate(
+        delegateMessage: DelegateMessage,
+        memo?: string,
+        delegateFee?: StdFee
+    ): Promise<DeliverTxResponse> {
+        delegateFee =
+            delegateFee == null
+                ? this.getFee(defaultExecGas, defaultGasPrice)
+                : delegateFee;
+
+        return await this.wallet.stargateSigner.delegateTokens(
+            this.wallet.address,
+            delegateMessage.validator,
+            delegateMessage.coin,
+            delegateFee,
+            memo
+        );
+    }
+
+    public async undelegate(
+        undelegateMessage: UndelegateMessage,
+        memo?: string,
+        undelegateFee?: StdFee
+    ): Promise<DeliverTxResponse> {
+        undelegateFee =
+            undelegateFee == null
+                ? this.getFee(defaultExecGas, defaultGasPrice)
+                : undelegateFee;
+
+        return await this.wallet.stargateSigner.delegateTokens(
+            this.wallet.address,
+            undelegateMessage.validator,
+            undelegateMessage.coin,
+            undelegateFee,
+            memo
+        );
+    }
+
+    public async withdrawRewards(
+        validatorAddress: string,
+        memo?: string,
+        withdrawFee?: StdFee
+    ) {
+        withdrawFee =
+            withdrawFee == null
+                ? this.getFee(defaultExecGas, defaultGasPrice)
+                : withdrawFee;
+        return await this.wallet.stargateSigner.withdrawRewards(
+            this.wallet.address,
+            validatorAddress,
+            withdrawFee,
+            memo
         );
     }
 

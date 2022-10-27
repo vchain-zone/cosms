@@ -3,6 +3,7 @@ import {
     SigningCosmWasmClientOptions,
 } from '@cosmjs/cosmwasm-stargate';
 import {
+    Coin,
     DirectSecp256k1HdWallet,
     makeCosmoshubPath,
     OfflineSigner,
@@ -37,7 +38,8 @@ export class Wallet {
             hdPaths: [makeCosmoshubPath(0)],
             prefix: provider.bech32Prefix,
         });
-        let cosmWasmClient, stargateClient;
+        let cosmWasmClient: SigningCosmWasmClient;
+        let stargateClient: SigningStargateClient;
         if (options != undefined) {
             cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
                 provider.rpcUrl,
@@ -84,7 +86,8 @@ export class Wallet {
         const accounts = await wallets.getAccounts();
         const results = [];
         for (let i = 0; i < accounts.length; i++) {
-            let cosmWasmClient, stargateClient;
+            let cosmWasmClient: SigningCosmWasmClient;
+            let stargateClient: SigningStargateClient;
             if (options != undefined) {
                 cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
                     provider.rpcUrl,
@@ -122,7 +125,8 @@ export class Wallet {
         const results = [];
         const accounts = await signer.getAccounts();
         for (let i = 0; i < accounts.length; i++) {
-            let cosmWasmClient, stargateClient;
+            let cosmWasmClient: SigningCosmWasmClient;
+            let stargateClient: SigningStargateClient;
             if (options != undefined) {
                 cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
                     provider.rpcUrl,
@@ -187,6 +191,14 @@ export class Wallet {
 
     get stargateSigner(): SigningStargateClient {
         return this._stargateSigner;
+    }
+
+    public coin(denom: string, amount: string): Coin {
+        const coin: Coin = {
+            denom: denom,
+            amount: amount
+        }
+        return coin;
     }
 }
 
