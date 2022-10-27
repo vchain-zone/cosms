@@ -14,16 +14,20 @@ import { defaultSigningClientOptions, faucet } from './testutils.spec';
 
 import Cosm from './index';
 
+
 // const rpcUrl = 'https://testnet.rpc.orai.io';
-// const rpcUrl = 'https://cosmos-testnet-rpc.allthatnode.com:26657';
-const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
+// const rpcUrl = 'https://rpc.orai.io';
+const rpcUrl = 'https://sifchain-rpc.polkachu.com';
+// const rpcUrl = "https://rpc-cosmoshub.keplr.app";
+// const rpcUrl = "https://rpc-osmosis.keplr.app";
+// const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
 let provider;
 let cosm;
 let wallet: DirectSecp256k1HdWallet;
 let client;
 let account: AccountData;
-// const prefix = 'cosmos';
-const prefix = 'osmo';
+const prefix = 'cosmos';
+// const prefix = 'osmo';
 let currentBlock;
 
 let validatorAddr;
@@ -157,11 +161,11 @@ describe('Cosm test', async () => {
       // console.log(validatorDelegationsResponse);
       expect(validatorDelegationsResponse).is.not.eq(undefined);
 
-      let queryParamsResponse = await staking.query.Params({});
+      const queryParamsResponse = await staking.query.Params({});
       // console.log(queryParamsResponse);
       expect(queryParamsResponse).is.not.empty;
 
-      let queryHistoricalInfoResponse = await staking.query.HistoricalInfo({
+      const queryHistoricalInfoResponse = await staking.query.HistoricalInfo({
         height: Long.fromNumber(currentBlock),
       });
       // console.log(queryHistoricalInfoResponse);
@@ -171,35 +175,28 @@ describe('Cosm test', async () => {
     it('should get delegator info', async () => {
       const staking = cosm.cosmos.staking;
 
-      let queryDelegatorDelegationsResponse =
+      const queryDelegatorDelegationsResponse =
         await staking.query.DelegatorDelegations({
-          delegatorAddr: account.address,
+          delegatorAddr: delegation.delegatorAddress,
         });
       // console.log(queryDelegatorDelegationsResponse);
       expect(queryDelegatorDelegationsResponse).is.not.empty;
 
-      let queryDelegatorUnbondingDelegationsResponse =
+      const queryDelegatorUnbondingDelegationsResponse =
         await staking.query.DelegatorUnbondingDelegations({
-          delegatorAddr: account.address,
+          delegatorAddr: delegation.delegatorAddress,
         });
       // console.log(queryDelegatorUnbondingDelegationsResponse);
       expect(queryDelegatorUnbondingDelegationsResponse).is.not.empty;
 
-      let queryDelegatorValidatorsResponse =
+      const queryDelegatorValidatorsResponse =
         await staking.query.DelegatorValidators({
-          delegatorAddr: account.address,
+          delegatorAddr: delegation.delegatorAddress,
         });
       // console.log(queryDelegatorValidatorsResponse);
       expect(queryDelegatorValidatorsResponse).is.not.empty;
 
-      const validatorDelegationsResponse = await staking
-        .block(currentBlock - 100)
-        .query.ValidatorDelegations({ validatorAddr: validatorAddr });
-
-      const delegation =
-        validatorDelegationsResponse.delegationResponses[0].delegation;
-
-      let queryDelegationResponse = await staking.query.Delegation({
+      const queryDelegationResponse = await staking.query.Delegation({
         delegatorAddr: delegation.delegatorAddress,
         validatorAddr: delegation.validatorAddress,
       });
@@ -213,7 +210,7 @@ describe('Cosm test', async () => {
       // console.log(queryDelegationResponse);
       // expect(queryUnbondingDelegationResponse).is.not.empty;
 
-      let queryDelegatorValidatorResponse =
+      const queryDelegatorValidatorResponse =
         await staking.query.DelegatorValidator({
           delegatorAddr: delegation.delegatorAddress,
           validatorAddr: delegation.validatorAddress,
@@ -234,55 +231,69 @@ describe('Cosm test', async () => {
       const delegation =
         validatorDelegationsResponse.delegationResponses[0].delegation;
 
-      let queryParamsResponse = await distribution.query.Params({});
+      const queryParamsResponse = await distribution.query.Params({});
       // console.log("queryParamsResponse");
       // console.log(queryParamsResponse);
 
-      let queryValidatorOutstandingRewardsResponse =
+      const queryValidatorOutstandingRewardsResponse =
         await distribution.query.ValidatorOutstandingRewards({
           validatorAddress: validatorAddr,
         });
       // console.log("queryValidatorOutstandingRewardsResponse");
       // console.log(queryValidatorOutstandingRewardsResponse);
 
-      let queryValidatorCommissionResponse =
+      const queryValidatorCommissionResponse =
         await distribution.query.ValidatorCommission({
           validatorAddress: validatorAddr,
         });
       // console.log("queryValidatorCommissionResponse");
       // console.log(queryValidatorCommissionResponse);
 
-      let queryDelegationRewardsResponse =
+      const queryDelegationRewardsResponse =
         await distribution.query.DelegationRewards(delegation);
       // console.log("queryDelegationRewardsResponse");
       // console.log(queryDelegationRewardsResponse);
 
-      let queryDelegationTotalRewardsResponse =
+      const queryDelegationTotalRewardsResponse =
         await distribution.query.DelegationTotalRewards({
           delegatorAddress: delegation.delegatorAddress,
         });
       // console.log("queryDelegationTotalRewardsResponse");
       // console.log(queryDelegationTotalRewardsResponse);
 
-      let queryDelegatorValidatorsResponse =
+      const queryDelegatorValidatorsResponse =
         await distribution.query.DelegatorValidators({
           delegatorAddress: delegation.delegatorAddress,
         });
       // console.log("queryDelegatorValidatorsResponse");
       // console.log(queryDelegatorValidatorsResponse);
 
-      let queryDelegatorWithdrawAddressResponse =
+      const queryDelegatorWithdrawAddressResponse =
         await distribution.query.DelegatorWithdrawAddress({
           delegatorAddress: delegation.delegatorAddress,
         });
       // console.log("queryDelegatorWithdrawAddressResponse");
       // console.log(queryDelegatorWithdrawAddressResponse);
 
-      let queryCommunityPoolResponse = await distribution.query.CommunityPool(
+      const queryCommunityPoolResponse = await distribution.query.CommunityPool(
         {}
       );
       // console.log('queryCommunityPoolResponse');
       // console.log(queryCommunityPoolResponse);
+    });
+  });
+
+  describe('Get mint denom', async () => {
+    it('should get mint', async function () {
+      const mint = cosm.cosmos.mint;
+      const mintDenomParams = await mint.query.Params({});
+      console.log(mintDenomParams.params);
+
+      // cosm.cosmos.bank.prefixServices("orai")
+      // let denoms = await cosm.cosmos.bank.query.DenomsMetadata({ denom: 'orai' });
+      // console.log(denoms);
+      // let denom = await cosm.cosmos.bank.query.DenomMetadata({ denom: 'orai' });
+      // console.log(denom);
     });
   });
 });

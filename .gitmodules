@@ -1,0 +1,3 @@
+[submodule "src/artifacts/chain-registry"]
+	path = src/artifacts/chain-registry
+	url = git@github.com:vchain-zone/chain-registry.git

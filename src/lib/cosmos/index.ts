@@ -1,6 +1,7 @@
 import { version } from '../cosm/version';
-import { provider } from '../providers';
+import { Provider } from '../providers';
 import { Wallet } from '../wallet';
+
 import { App } from './app';
 import { Auth } from './auth';
 import { Authz } from './authz';
@@ -34,7 +35,7 @@ export default class Cosmos {
     return this._wallet;
   }
 
-  private _provider: provider;
+  private _provider: Provider;
   public version: string;
   public app: App;
   public auth: Auth;
@@ -58,7 +59,7 @@ export default class Cosmos {
   public vesting: Vesting;
   private _wallet: Wallet;
 
-  constructor(provider: provider) {
+  constructor(provider: Provider) {
     this._provider = provider;
 
     this.app = new App(provider);
