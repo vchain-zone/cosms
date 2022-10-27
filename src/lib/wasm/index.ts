@@ -1,4 +1,5 @@
 import {
+    CosmWasmClient,
     ExecuteInstruction,
     ExecuteResult,
     InstantiateOptions,
@@ -14,6 +15,8 @@ import {
     GasPrice,
     StdFee,
 } from '@cosmjs/stargate';
+
+import { Provider } from '../providers';
 
 import { Wallet } from '../wallet';
 
@@ -61,11 +64,58 @@ export interface UndelegateMessage {
     readonly coin: Coin;
 }
 
-export class Wasm {
-    private wallet: Wallet;
+export class StaticWasm {
+    private _provider: Provider;
+    private _cosmWasmClient: CosmWasmClient;
+
+    constructor(provider: Provider) {
+        this._provider = provider;
+    }
+
+    public async query(queryMessage: QueryMessage): Promise<JsonObject> {
+        await this.checkCosmWasmClient();
+        return await this._cosmWasmClient.queryContractSmart(
+            queryMessage.contractAddr,
+            queryMessage.queryMsg
+        );
+    }
+
+    public async getBalance(address: string, denom: string){
+        await this.checkCosmWasmClient();
+        return await this._cosmWasmClient.getBalance(
+            address,
+            denom
+        );
+    }
+
+    private async checkCosmWasmClient(){
+        if (!this.cosmWasmClient) {
+            this._cosmWasmClient = await CosmWasmClient.connect(this.provider.rpcUrl);
+        }
+    }
+
+    get provider(): Provider {
+        return this._provider;
+    }
+    get cosmWasmClient(): CosmWasmClient {
+        return this._cosmWasmClient;
+    }
+}
+
+export class Wasm extends StaticWasm {
+    private _wallet: Wallet;
 
     constructor(wallet: Wallet) {
-        this.wallet = wallet;
+        super(wallet.provider);
+        this._wallet = wallet;
+    }
+
+    public async connect(wallet: Wallet) : Promise<Wasm> {
+        return new Wasm(wallet);
+    }
+
+    public static async connect(provider: Provider): Promise<StaticWasm> {
+        return new StaticWasm(provider);
     }
 
     public async uploadWasm(
@@ -166,13 +216,6 @@ export class Wasm {
         );
     }
 
-    public async query(queryMessage: QueryMessage): Promise<JsonObject> {
-        return await this.wallet.cosmWasmSigner.queryContractSmart(
-            queryMessage.contractAddr,
-            queryMessage.queryMsg
-        );
-    }
-
     public async send(
         sendMessage: SendMessage,
         memo?: string,
@@ -249,5 +292,9 @@ export class Wasm {
             gas,
             GasPrice.fromString(gasPrice.toString() + this.wallet.provider.feeToken)
         );
+    }
+
+    get wallet(): Wallet {
+        return this._wallet;
     }
 }

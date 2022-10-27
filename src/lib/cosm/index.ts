@@ -38,7 +38,7 @@ export default class Cosm {
   constructor(provider: Provider) {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
-    // this.wasm = new Wasm(provider);
+    // this.wasm = new Wasm(provider);;
     this.wasm = new Wasm(provider);
     this.tendermint = provider.tendermintClient;
     this.utils = new Utils();
