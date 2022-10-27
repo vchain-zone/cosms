@@ -14,7 +14,7 @@ import {
     SigningStargateClientOptions,
 } from '@cosmjs/stargate';
 
-import { provider } from '../providers';
+import { Provider } from '../providers';
 
 export interface WalletOptions {
     readonly cosmWasmOptions?: SigningCosmWasmClientOptions;
@@ -25,11 +25,11 @@ export class Wallet {
     private _signer: OfflineSigner;
     private _cosmWasmSigner: SigningCosmWasmClient;
     private _stargateSigner: SigningStargateClient;
-    private _provider: provider;
+    private _provider: Provider;
     private _account: AccountData;
 
     public static async getWalletFromMnemonic(
-        provider: provider,
+        provider: Provider,
         mnemonic: string,
         options?: WalletOptions
     ): Promise<Wallet> {
@@ -66,7 +66,7 @@ export class Wallet {
     }
 
     public static async getWalletsFromMnemonic(
-        provider: provider,
+        provider: Provider,
         mnemonic: string,
         amount: number,
         options?: WalletOptions
@@ -117,7 +117,7 @@ export class Wallet {
     }
 
     public static async getWalletsFromOfflineSigner(
-        provider: provider,
+        provider: Provider,
         signer: OfflineSigner,
         options?: WalletOptions
     ): Promise<Wallet[]> {
@@ -156,7 +156,7 @@ export class Wallet {
     }
 
     private constructor(
-        provider: provider,
+        provider: Provider,
         signer: OfflineSigner,
         account: AccountData,
         cosmWasmSigner: SigningCosmWasmClient,
@@ -177,7 +177,7 @@ export class Wallet {
         return this._provider.feeToken;
     }
 
-    get provider(): provider {
+    get provider(): Provider {
         return this._provider;
     }
 
@@ -202,7 +202,7 @@ export class Wallet {
     }
 }
 
-const checkProvider = (provider: provider) => {
+const checkProvider = (provider: Provider) => {
     if (provider.bech32Prefix == undefined || provider.feeToken == undefined) {
         throw "Require set bech32Prefix and feeToken for Provider";
     }
