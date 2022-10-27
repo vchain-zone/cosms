@@ -8,7 +8,7 @@ import {
 } from '../tendermint-batch-rpc/tendermintbatchclient';
 import { Utils } from '../utils';
 import { Wallet } from '../wallet';
-import { Wasm } from '../wasm';
+import { StaticWasm, Wasm } from '../wasm';
 
 import { version } from './version';
 
@@ -30,7 +30,7 @@ export default class Cosm {
   private _provider: Provider;
   utils: Utils;
   cosmos: Cosmos;
-  wasm: Wasm;
+  wasm: Wasm | StaticWasm;
   tendermint: TendermintBatchClient;
 
   calculator: APRCalCulator;
@@ -39,7 +39,7 @@ export default class Cosm {
     this._provider = provider;
     this.cosmos = new Cosmos(provider);
     // this.wasm = new Wasm(provider);;
-    this.wasm = new Wasm(provider);
+    this.wasm = Wasm.connect(provider);
     this.tendermint = provider.tendermintClient;
     this.utils = new Utils();
     this.calculator = new APRCalCulator(this.cosmos, provider);
@@ -48,6 +48,7 @@ export default class Cosm {
   async setWallet(wallet: Wallet) {
     this._wallet = wallet;
     this.cosmos.setWallet(wallet);
+    this.wasm = new Wasm(wallet);
   }
 
   static readonly version: string = version;
