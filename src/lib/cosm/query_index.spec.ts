@@ -15,9 +15,9 @@ import { defaultSigningClientOptions, faucet } from './testutils.spec';
 import Cosm from './index';
 
 
-// const rpcUrl = 'https://testnet.rpc.orai.io';
+const rpcUrl = 'https://testnet.rpc.orai.io';
 // const rpcUrl = 'https://rpc.orai.io';
-const rpcUrl = 'https://sifchain-rpc.polkachu.com';
+// const rpcUrl = 'https://sifchain-rpc.polkachu.com';
 // const rpcUrl = "https://rpc-cosmoshub.keplr.app";
 // const rpcUrl = "https://rpc-osmosis.keplr.app";
 // const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
@@ -26,7 +26,7 @@ let cosm;
 let wallet: DirectSecp256k1HdWallet;
 let client;
 let account: AccountData;
-const prefix = 'cosmos';
+const prefix = 'orai';
 // const prefix = 'osmo';
 let currentBlock;
 
