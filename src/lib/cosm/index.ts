@@ -28,7 +28,7 @@ export default class Cosm {
   }
 
   private _provider: Provider;
-  utils: Utils;
+  static utils = Utils;
   cosmos: Cosmos;
   wasm: Wasm | StaticWasm;
   tendermint: TendermintBatchClient;
@@ -41,7 +41,7 @@ export default class Cosm {
     // this.wasm = new Wasm(provider);;
     this.wasm = Wasm.connect(provider);
     this.tendermint = provider.tendermintClient;
-    this.utils = new Utils();
+    // this.utils = new Utils();
     this.calculator = new APRCalCulator(this.cosmos, provider);
   }
 
