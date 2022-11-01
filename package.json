@@ -47,7 +47,8 @@
     "@cosmjs/cosmwasm-stargate": "^0.29.2",
     "@cosmjs/proto-signing": "^0.29.0",
     "@cosmjs/stargate": "^0.29.0",
-    "cosmjs-types": "^0.5.1"
+    "cosmjs-types": "^0.5.1",
+    "crypto-addr-codec": "^0.1.7"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
