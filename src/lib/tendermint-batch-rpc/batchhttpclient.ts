@@ -9,7 +9,6 @@ import {
   HttpEndpoint
 } from '@cosmjs/tendermint-rpc/build/rpcclients';
 import { http } from '@cosmjs/tendermint-rpc/build/rpcclients/httpclient';
-import { orderByFromJSON } from 'cosmjs-types/cosmos/tx/v1beta1/service';
 
 export class BatchHttpClient extends HttpClient {
   protected readonly declare url: string;
