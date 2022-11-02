@@ -3,9 +3,13 @@ import { BaseProvider } from '../providers';
 
 import Cosm from './index';
 
-const rpcUrl = 'https://testnet.rpc.orai.io';
-// const rpcUrl = "https://public-rpc1.stafihub.io";
-// const rpcUrl = "https://rpc-cosmoshub.keplr.app";
+// const rpcUrl = 'https://testnet.rpc.orai.io';
+const rpcUrl = 'https://rpc.orai.io';
+// const rpcUrl = 'https://public-rpc1.stafihub.io';
+// const rpcUrl = "https://node1.konstellation.tech:26657";
+// const rpcUrl = "https://konstellation-rpc.polkachu.com";
+// const rpcUrl = "https://rpc-archive.sifchain.finance";
+// const rpcUrl = "https://rpc-sifchain.ecostake.com";
 // const rpcUrl = "https://rpc-osmosis.keplr.app";
 // const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
 let provider;
@@ -22,10 +26,10 @@ describe('Cosm test', async () => {
   describe('Test message', async () => {
     it('Test helper', async function() {
 
-      const start = 8568000;
-      const end = 8568202;
+      const end = await provider.batchQueryClient.getHeight();
+      const start = end - 100;
 
-      let uptime =  await cosm.helper.getUptime(start, end);
+      let uptime = await cosm.helper.getUptimeBatch(start, end,40);
       console.log(uptime);
     });
   });
