@@ -2,6 +2,7 @@ import { OfflineSigner } from '@cosmjs/proto-signing';
 
 import APRCalCulator from '../apr';
 import Cosmos from '../cosmos';
+import { Helper } from '../helpers/index.js';
 import { Provider } from '../providers';
 import {
   TendermintBatchClient
@@ -13,6 +14,8 @@ import { StaticWasm, Wasm } from '../wasm';
 import { version } from './version';
 
 export default class Cosm {
+  helper: Helper;
+
   get wallet(): Wallet {
     if (!this._wallet) {
       throw 'Must call Cosm.setSigner(offlineSigner: OfflineSigner, options?: SigningStargateClientOptions) or Cosm.setWallet(wallet: Wallet) before using wallet';
@@ -43,6 +46,7 @@ export default class Cosm {
     this.tendermint = provider.tendermintClient;
     // this.utils = new Utils();
     this.calculator = new APRCalCulator(this.cosmos, provider);
+    this.helper = new Helper(this);
   }
 
   async setWallet(wallet: Wallet) {
