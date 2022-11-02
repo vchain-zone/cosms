@@ -1,12 +1,10 @@
-import bech32 from 'bech32';
 import {
   isValidChecksumAddress,
   stripHexPrefix,
   toChecksumAddress
 } from 'crypto-addr-codec';
+import { bech32 } from './bech32';
 
-
-const { encode, decode, toWords, fromWords } = bech32;
 
 function hexEncoder() {
   return (data) => toChecksumAddress(data.toString('hex'));
@@ -29,18 +27,18 @@ function hexDecoder() {
 }
 
 function bech32Encoder(prefix) {
-  return (data) => encode(prefix, toWords(data));
+  return (data) => bech32.encode(prefix, bech32.toWords(data));
 }
 
 function bech32Decoder(currPrefix) {
   return (data) => {
-    const { prefix, words } = decode(data);
+    const { prefix, words } = bech32.decode(data);
 
     if (prefix !== currPrefix) {
       throw Error('Invalid address format');
     }
 
-    return Buffer.from(fromWords(words));
+    return Buffer.from(bech32.fromWords(words));
   };
 }
 
@@ -77,8 +75,9 @@ function toBech32(prefix, address) {
 }
 
 function fromBytes(prefix, bytes: ArrayLike<number>) {
-  return bech32.encode(prefix, toWords(bytes));
+  return bech32.encode(prefix, bech32.toWords(bytes));
 }
+
 
 export const Bech32Helper = {
   converter,
