@@ -27,9 +27,9 @@ describe('Cosm test', async () => {
     it('Test helper', async function() {
 
       const end = await provider.batchQueryClient.getHeight();
-      const start = end - 100;
+      const start = end - 9;
 
-      let uptime = await cosm.helper.getUptimeBatch(start, end,40);
+      let uptime = await cosm.helper.getUptimeBatch(start, end,4);
       console.log(uptime);
     });
   });

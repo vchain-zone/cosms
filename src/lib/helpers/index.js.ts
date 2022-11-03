@@ -71,15 +71,15 @@ export class Helper {
     let upTimeResults = {
       startBlock: startBlock,
       endBlock: endBlock,
-      upTime: {},
-      proposeTime: {}
+      upTime: undefined,
+      proposeTime: undefined
     };
 
 
     for (const range of ranges) {
-      const upTime = await this.getUptime(range[0], range[1]);
-      upTimeResults.upTime = deepmerge(upTime.upTime,upTimeResults.upTime);
-      upTimeResults.proposeTime = deepmerge(upTime.proposeTime,upTimeResults.proposeTime);
+      let upTime = await this.getUptime(range[0], range[1]);
+      upTimeResults.upTime = mergeWithAdd(upTimeResults.upTime,upTime.upTime);
+      upTimeResults.proposeTime = mergeWithAdd(upTimeResults.proposeTime,upTime.proposeTime);
 
     }
     return upTimeResults;
