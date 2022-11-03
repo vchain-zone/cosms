@@ -8,7 +8,6 @@ const rpcUrl = 'https://rpc.orai.io';
 // const rpcUrl = 'https://public-rpc1.stafihub.io';
 // const rpcUrl = "https://node1.konstellation.tech:26657";
 // const rpcUrl = "https://konstellation-rpc.polkachu.com";
-// const rpcUrl = "https://rpc-archive.sifchain.finance";
 // const rpcUrl = "https://rpc-sifchain.ecostake.com";
 // const rpcUrl = "https://rpc-osmosis.keplr.app";
 // const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';

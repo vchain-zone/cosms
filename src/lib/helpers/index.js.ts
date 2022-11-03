@@ -1,6 +1,6 @@
 import * as responses
   from '@cosmjs/tendermint-rpc/build/tendermint35/responses';
-import deepmerge from 'deepmerge';
+
 import Cosm from '../cosm';
 import { breakToRanges, mergeWithAdd } from '../utils/range';
 
@@ -19,8 +19,8 @@ export class Helper {
     const blocks = await tendermint.doCallBatch();
     const blockResults = {};
     for (const blocksKey in blocks) {
-      let block = blocks[blocksKey];
-      let blockHeight = block.block.header.height;
+      const block = blocks[blocksKey];
+      const blockHeight = block.block.header.height;
       blockResults[blockHeight] = block;
     }
     return blockResults;
@@ -30,27 +30,27 @@ export class Helper {
     const ranges = breakToRanges(startBlock, endBlock, batchSize);
     let blockResults = {};
     for (const range of ranges) {
-      let blocks = await this.getBlocks(range[0], range[1]);
+      const blocks = await this.getBlocks(range[0], range[1]);
       blockResults = { ...blockResults, ...blocks };
     }
     return blockResults;
   }
 
   async getUptime(startBlock, endBlock) {
-    let blocks = await this.getBlocks(startBlock, endBlock);
-    let upTimeResult = {};
-    let proposeTimeResult = {};
+    const blocks = await this.getBlocks(startBlock, endBlock);
+    const upTimeResult = {};
+    const proposeTimeResult = {};
 
     for (const blocksKey in blocks) {
-      let block: responses.BlockResponse = blocks[blocksKey];
-      let proposerAddress = Cosm.utils.uint8Array.toHex(block.block.header.proposerAddress);
-      let proposeTime = proposeTimeResult[proposerAddress] | 0;
+      const block: responses.BlockResponse = blocks[blocksKey];
+      const proposerAddress = Cosm.utils.uint8Array.toHex(block.block.header.proposerAddress);
+      const proposeTime = proposeTimeResult[proposerAddress] || 0;
       proposeTimeResult[proposerAddress] = proposeTime + 1;
-      let signatures = block.block.lastCommit.signatures;
+      const signatures = block.block.lastCommit.signatures;
       for (const signature of signatures) {
         try {
-          let validatorAddress = Cosm.utils.uint8Array.toHex(signature.validatorAddress);
-          let upTime = upTimeResult[validatorAddress] | 0;
+          const validatorAddress = Cosm.utils.uint8Array.toHex(signature.validatorAddress);
+          const upTime = upTimeResult[validatorAddress] || 0;
           upTimeResult[validatorAddress] = upTime + 1;
         } catch (e) {
           console.debug(`Warn: block.lastCommit.signatures : signature ${JSON.stringify(signature)}`);
@@ -67,8 +67,8 @@ export class Helper {
   }
 
   async getUptimeBatch(startBlock, endBlock, batchSize = 1000) {
-    let ranges = breakToRanges(startBlock, endBlock, batchSize);
-    let upTimeResults = {
+    const ranges = breakToRanges(startBlock, endBlock, batchSize);
+    const upTimeResults = {
       startBlock: startBlock,
       endBlock: endBlock,
       upTime: undefined,
@@ -77,7 +77,7 @@ export class Helper {
 
 
     for (const range of ranges) {
-      let upTime = await this.getUptime(range[0], range[1]);
+      const upTime = await this.getUptime(range[0], range[1]);
       upTimeResults.upTime = mergeWithAdd(upTimeResults.upTime,upTime.upTime);
       upTimeResults.proposeTime = mergeWithAdd(upTimeResults.proposeTime,upTime.proposeTime);
 
