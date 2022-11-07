@@ -1,7 +1,9 @@
 import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import { SigningStargateClient } from '@cosmjs/stargate';
-import { PrivateSigningStargateClient } from '@cosmjs/stargate/build/signingstargateclient';
+import {
+  PrivateSigningStargateClient
+} from '@cosmjs/stargate/build/signingstargateclient';
 import { expect } from 'chai';
 import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
 import { BondStatus } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
@@ -10,9 +12,9 @@ import 'mocha';
 
 import { BaseProvider } from '../providers';
 
-import { defaultSigningClientOptions, faucet } from './testutils.spec';
-
 import Cosm from './index';
+
+import { defaultSigningClientOptions, faucet } from './testutils.spec';
 
 
 const rpcUrl = 'https://testnet.rpc.orai.io';
@@ -40,7 +42,7 @@ describe('Cosm test', async () => {
     cosm = new Cosm(provider);
 
     wallet = await DirectSecp256k1HdWallet.fromMnemonic(faucet.mnemonic, {
-      prefix: prefix,
+      prefix: prefix
     });
 
     account = (await wallet.getAccounts())[0];
@@ -59,19 +61,17 @@ describe('Cosm test', async () => {
 
   before('Setup delegation info', async () => {
     const queryValidatorsResponse = await cosm.cosmos.staking
-      .block(currentBlock - 100)
-      .query.Validators({ status: BondStatus[BondStatus.BOND_STATUS_BONDED] });
+      .query.block(currentBlock - 100).Validators({ status: BondStatus[BondStatus.BOND_STATUS_BONDED] });
     // console.log(queryValidatorsResponse);
 
     validatorAddr = queryValidatorsResponse.validators[0].operatorAddress;
     const validatorDelegationsResponse = await cosm.cosmos.staking
-      .block(currentBlock - 100)
-      .query.ValidatorDelegations({ validatorAddr: validatorAddr });
+      .query.block(currentBlock - 100).ValidatorDelegations({ validatorAddr: validatorAddr });
 
     delegation = validatorDelegationsResponse.delegationResponses[0].delegation;
   });
   describe('test client', async () => {
-    it('should lookup MsgCustom success', function () {
+    it('should lookup MsgCustom success', function() {
       const openedClient = client as unknown as PrivateSigningStargateClient;
       expect(openedClient.registry.lookupType('/custom.MsgCustom')).is.equal(
         MsgSend
@@ -79,7 +79,7 @@ describe('Cosm test', async () => {
     });
   });
   describe('Get blockchain information', async () => {
-    it('should get blockchain info', async function () {
+    it('should get blockchain info', async function() {
       const chainId = await provider.batchQueryClient.getChainId();
       expect(chainId, `Chain id: ${chainId}`).is.not.empty;
 
@@ -97,7 +97,7 @@ describe('Cosm test', async () => {
   describe('Test auth query', async () => {
     it('should get bank accounts', async () => {
       const _account = await cosm.cosmos.auth.query.Account({
-        address: delegation.delegatorAddress,
+        address: delegation.delegatorAddress
       });
       // console.log(accounts);
       expect(_account).is.not.eq(undefined);
@@ -111,53 +111,46 @@ describe('Cosm test', async () => {
   describe('Test bank query', async () => {
     it('should get bank info', async () => {
       const totalSupplyResponse = await cosm.cosmos.bank
-        .block(currentBlock - 10)
-        .query.TotalSupply({});
+        .query.block(currentBlock - 10).TotalSupply({});
       // console.log(totalSupplyResponse);
       expect(totalSupplyResponse).is.not.empty;
 
       const paramsResponse = await cosm.cosmos.bank
-        .block(currentBlock - 11)
-        .query.Params({});
+        .query.block(currentBlock - 11).Params({});
       // console.log(paramsResponse);
       expect(paramsResponse).is.not.empty;
 
       const denomsMetadataResponse = await cosm.cosmos.bank
-        .block(currentBlock - 12)
-        .query.DenomsMetadata({});
+        .query
+        .block(currentBlock - 12).DenomsMetadata({});
       // console.log(denomsMetadataResponse);
       expect(denomsMetadataResponse).is.not.empty;
     });
 
     it('should get bank account info', async () => {
-      const allBalancesResponse = await cosm.cosmos.bank
-        .block(currentBlock - 12)
-        .query.AllBalances({ address: delegation.delegatorAddress });
+      const allBalancesResponse = await cosm.cosmos.bank.query
+        .block(currentBlock - 12).AllBalances({ address: delegation.delegatorAddress });
       // console.log(allBalancesResponse);
       expect(allBalancesResponse).is.not.empty;
     });
   });
 
   describe('Test staking query', async () => {
-    it('should get staking info', async function () {
+    it('should get staking info', async function() {
       const staking = cosm.cosmos.staking;
-      const queryValidatorsResponse = await staking
-        .block(currentBlock - 100)
-        .query.Validators({
-          status: BondStatus[BondStatus.BOND_STATUS_BONDED],
+      const queryValidatorsResponse = await staking.query
+        .block(currentBlock - 100).Validators({
+          status: BondStatus[BondStatus.BOND_STATUS_BONDED]
         });
       // console.log(queryValidatorsResponse);
       expect(queryValidatorsResponse.validators).is.not.eq(undefined);
 
-      const validatorResponse = await staking
-        .block(currentBlock - 100)
-        .query.Validator({ validatorAddr: validatorAddr });
+      const validatorResponse = await staking.query
+        .block(currentBlock - 100).Validator({ validatorAddr: validatorAddr });
       // console.log(validatorResponse);
       expect(validatorResponse).is.not.eq(undefined);
 
-      const validatorDelegationsResponse = await staking
-        .block(currentBlock - 100)
-        .query.ValidatorDelegations({ validatorAddr: validatorAddr });
+      const validatorDelegationsResponse = await staking.query.block(currentBlock - 100).ValidatorDelegations({ validatorAddr: validatorAddr });
       // console.log(validatorDelegationsResponse);
       expect(validatorDelegationsResponse).is.not.eq(undefined);
 
@@ -166,7 +159,7 @@ describe('Cosm test', async () => {
       expect(queryParamsResponse).is.not.empty;
 
       const queryHistoricalInfoResponse = await staking.query.HistoricalInfo({
-        height: Long.fromNumber(currentBlock),
+        height: Long.fromNumber(currentBlock)
       });
       // console.log(queryHistoricalInfoResponse);
       expect(queryHistoricalInfoResponse).is.not.empty;
@@ -177,28 +170,28 @@ describe('Cosm test', async () => {
 
       const queryDelegatorDelegationsResponse =
         await staking.query.DelegatorDelegations({
-          delegatorAddr: delegation.delegatorAddress,
+          delegatorAddr: delegation.delegatorAddress
         });
       // console.log(queryDelegatorDelegationsResponse);
       expect(queryDelegatorDelegationsResponse).is.not.empty;
 
       const queryDelegatorUnbondingDelegationsResponse =
         await staking.query.DelegatorUnbondingDelegations({
-          delegatorAddr: delegation.delegatorAddress,
+          delegatorAddr: delegation.delegatorAddress
         });
       // console.log(queryDelegatorUnbondingDelegationsResponse);
       expect(queryDelegatorUnbondingDelegationsResponse).is.not.empty;
 
       const queryDelegatorValidatorsResponse =
         await staking.query.DelegatorValidators({
-          delegatorAddr: delegation.delegatorAddress,
+          delegatorAddr: delegation.delegatorAddress
         });
       // console.log(queryDelegatorValidatorsResponse);
       expect(queryDelegatorValidatorsResponse).is.not.empty;
 
       const queryDelegationResponse = await staking.query.Delegation({
         delegatorAddr: delegation.delegatorAddress,
-        validatorAddr: delegation.validatorAddress,
+        validatorAddr: delegation.validatorAddress
       });
       // console.log(queryDelegationResponse);
       expect(queryDelegationResponse).is.not.empty;
@@ -213,7 +206,7 @@ describe('Cosm test', async () => {
       const queryDelegatorValidatorResponse =
         await staking.query.DelegatorValidator({
           delegatorAddr: delegation.delegatorAddress,
-          validatorAddr: delegation.validatorAddress,
+          validatorAddr: delegation.validatorAddress
         });
       // console.log(queryDelegatorValidatorResponse);
       expect(queryDelegatorValidatorResponse).is.not.empty;
@@ -221,12 +214,11 @@ describe('Cosm test', async () => {
   });
 
   describe('Test distribution query', async () => {
-    it('should get distribution info', async function () {
+    it('should get distribution info', async function() {
       const distribution = cosm.cosmos.distribution;
 
       const validatorDelegationsResponse = await cosm.cosmos.staking
-        .block(currentBlock - 100)
-        .query.ValidatorDelegations({ validatorAddr: validatorAddr });
+        .query.block(currentBlock - 100).ValidatorDelegations({ validatorAddr: validatorAddr });
 
       const delegation =
         validatorDelegationsResponse.delegationResponses[0].delegation;
@@ -237,14 +229,14 @@ describe('Cosm test', async () => {
 
       const queryValidatorOutstandingRewardsResponse =
         await distribution.query.ValidatorOutstandingRewards({
-          validatorAddress: validatorAddr,
+          validatorAddress: validatorAddr
         });
       // console.log("queryValidatorOutstandingRewardsResponse");
       // console.log(queryValidatorOutstandingRewardsResponse);
 
       const queryValidatorCommissionResponse =
         await distribution.query.ValidatorCommission({
-          validatorAddress: validatorAddr,
+          validatorAddress: validatorAddr
         });
       // console.log("queryValidatorCommissionResponse");
       // console.log(queryValidatorCommissionResponse);
@@ -256,21 +248,21 @@ describe('Cosm test', async () => {
 
       const queryDelegationTotalRewardsResponse =
         await distribution.query.DelegationTotalRewards({
-          delegatorAddress: delegation.delegatorAddress,
+          delegatorAddress: delegation.delegatorAddress
         });
       // console.log("queryDelegationTotalRewardsResponse");
       // console.log(queryDelegationTotalRewardsResponse);
 
       const queryDelegatorValidatorsResponse =
         await distribution.query.DelegatorValidators({
-          delegatorAddress: delegation.delegatorAddress,
+          delegatorAddress: delegation.delegatorAddress
         });
       // console.log("queryDelegatorValidatorsResponse");
       // console.log(queryDelegatorValidatorsResponse);
 
       const queryDelegatorWithdrawAddressResponse =
         await distribution.query.DelegatorWithdrawAddress({
-          delegatorAddress: delegation.delegatorAddress,
+          delegatorAddress: delegation.delegatorAddress
         });
       // console.log("queryDelegatorWithdrawAddressResponse");
       // console.log(queryDelegatorWithdrawAddressResponse);
@@ -284,7 +276,7 @@ describe('Cosm test', async () => {
   });
 
   describe('Get mint denom', async () => {
-    it('should get mint', async function () {
+    it('should get mint', async function() {
       const mint = cosm.cosmos.mint;
       const mintDenomParams = await mint.query.Params({});
       console.log(mintDenomParams.params);
