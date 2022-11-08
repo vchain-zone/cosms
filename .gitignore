@@ -16,4 +16,5 @@ _.npmrc
 .env
 
 **/*.tgz
+**/*_test.ts
 

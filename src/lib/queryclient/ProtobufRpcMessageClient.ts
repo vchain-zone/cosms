@@ -36,13 +36,12 @@ export function createProtobufRpcMessageClient(
     ): Promise<DeliverTxResponse> {
       const msgAny = self['currentMessage'];
       const address = wallet.address;
-      const result = wallet.stargateSigner.signAndBroadcast(
+      return  wallet.stargateSigner.signAndBroadcast(
         address,
         [msgAny],
         fee,
         memo
       );
-      return result;
     },
     prefixService(prefix?) {
       self['prefixService'] = prefix;

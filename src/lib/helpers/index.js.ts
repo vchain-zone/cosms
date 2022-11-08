@@ -49,6 +49,7 @@ export class Helper {
       const signatures = block.block.lastCommit.signatures;
       for (const signature of signatures) {
         try {
+          if (signature.blockIdFlag != 2) continue;
           const validatorAddress = Cosm.utils.uint8Array.toHex(signature.validatorAddress);
           const upTime = upTimeResult[validatorAddress] || 0;
           upTimeResult[validatorAddress] = upTime + 1;
@@ -78,8 +79,8 @@ export class Helper {
 
     for (const range of ranges) {
       const upTime = await this.getUptime(range[0], range[1]);
-      upTimeResults.upTime = mergeWithAdd(upTimeResults.upTime,upTime.upTime);
-      upTimeResults.proposeTime = mergeWithAdd(upTimeResults.proposeTime,upTime.proposeTime);
+      upTimeResults.upTime = mergeWithAdd(upTimeResults.upTime, upTime.upTime);
+      upTimeResults.proposeTime = mergeWithAdd(upTimeResults.proposeTime, upTime.proposeTime);
 
     }
     return upTimeResults;
