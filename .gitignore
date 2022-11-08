@@ -13,6 +13,7 @@ yarn.lock
 
 _.npmrc
 .npmrc
+.env
 
 **/*.tgz
 

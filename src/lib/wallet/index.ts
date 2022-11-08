@@ -1,204 +1,219 @@
 import {
-  SigningCosmWasmClient,
-  SigningCosmWasmClientOptions,
-  UploadResult,
+    SigningCosmWasmClient,
+    SigningCosmWasmClientOptions,
 } from '@cosmjs/cosmwasm-stargate';
 import {
-  DirectSecp256k1HdWallet,
-  makeCosmoshubPath,
-  OfflineSigner,
+    Coin,
+    DirectSecp256k1HdWallet,
+    makeCosmoshubPath,
+    OfflineSigner,
 } from '@cosmjs/proto-signing';
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import {
-  calculateFee,
-  GasPrice,
-  SigningStargateClient,
-  SigningStargateClientOptions,
-  StdFee,
+    SigningStargateClient,
+    SigningStargateClientOptions,
 } from '@cosmjs/stargate';
 
-import Cosm from '../cosm';
 import { Provider } from '../providers';
 
-const defaultUploadGas = 2500000;
-const defaultInitGas = 1000000;
-const defaultExecGas = 500000;
-const defaultGasPrice = 0.25;
-
-export default OfflineSigner;
-
 export interface WalletOptions {
-  readonly cosmWasmOptions: SigningCosmWasmClientOptions;
-  readonly stargateOptions: SigningStargateClientOptions;
+    readonly cosmWasmOptions?: SigningCosmWasmClientOptions;
+    readonly stargateOptions?: SigningStargateClientOptions;
 }
 
 export class Wallet {
-  get cosmWasmSigner(): SigningCosmWasmClient {
-    return this._cosmWasmSigner;
-  }
+    private _signer: OfflineSigner;
+    private _cosmWasmSigner: SigningCosmWasmClient;
+    private _stargateSigner: SigningStargateClient;
+    private _provider: Provider;
+    private _account: AccountData;
+    private readonly _isWallet: boolean;
 
-  get stargateSigner(): SigningStargateClient {
-    return this._stargateSigner;
-  }
-
-  private _signer: OfflineSigner;
-  private _cosmWasmSigner: SigningCosmWasmClient;
-  private _stargateSigner: SigningStargateClient;
-  private _account: AccountData;
-  private _denom: string;
-
-  public static async getWalletFromMnemonic(
-    provider: Provider,
-    mnemonic: string,
-    prefix: string,
-    options: WalletOptions = {
-      cosmWasmOptions: {},
-      stargateOptions: {},
+    public static async getWalletFromMnemonic(
+        provider: Provider,
+        mnemonic: string,
+        options?: WalletOptions
+    ): Promise<Wallet> {
+        checkProvider(provider);
+        const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+            hdPaths: [makeCosmoshubPath(0)],
+            prefix: provider.bech32Prefix,
+        });
+        let cosmWasmClient: SigningCosmWasmClient;
+        let stargateClient: SigningStargateClient;
+        if (options != undefined) {
+            cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
+                provider.rpcUrl,
+                wallet,
+                options.cosmWasmOptions
+            );
+            stargateClient = await SigningStargateClient.connectWithSigner(
+                provider.rpcUrl,
+                wallet,
+                options.stargateOptions
+            );
+        } else {
+            cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
+                provider.rpcUrl,
+                wallet
+            );
+            stargateClient = await SigningStargateClient.connectWithSigner(
+                provider.rpcUrl,
+                wallet
+            );
+        }
+        const [account] = await wallet.getAccounts();
+        return new Wallet(provider, wallet, account, cosmWasmClient, stargateClient);
     }
-  ): Promise<Wallet> {
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-      hdPaths: [makeCosmoshubPath(0)],
-      prefix: prefix,
-    });
-    const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
-      provider.rpcUrl,
-      wallet,
-      options.cosmWasmOptions
-    );
-    const stargateClient = await SigningStargateClient.connectWithSigner(
-      provider.rpcUrl,
-      wallet,
-      options.stargateOptions
-    );
-    const [account] = await wallet.getAccounts();
-    return new Wallet(
-      wallet,
-      account,
-      cosmWasmClient,
-      stargateClient,
-      await getDenom(provider)
-    );
-  }
 
-  public static async getWalletsFromMnemonic(
-    provider: Provider,
-    mnemonic: string,
-    prefix: string,
-    amount: number,
-    options?: WalletOptions
-  ): Promise<Wallet[]> {
-    const paths = [];
-    if (amount <= 1) {
-      throw 'Amount must be greater than one';
+    public static async getWalletsFromMnemonic(
+        provider: Provider,
+        mnemonic: string,
+        amount: number,
+        options?: WalletOptions
+    ): Promise<Wallet[]> {
+        checkProvider(provider);
+        const paths = [];
+        if (amount <= 1) {
+            throw 'Amount must be greater than one';
+        }
+        for (let i = 0; i < amount; i++) {
+            paths.push(makeCosmoshubPath(i));
+        }
+        const wallets = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+            hdPaths: paths,
+            prefix: provider.bech32Prefix,
+        });
+        const accounts = await wallets.getAccounts();
+        const results = [];
+        for (let i = 0; i < accounts.length; i++) {
+            let cosmWasmClient: SigningCosmWasmClient;
+            let stargateClient: SigningStargateClient;
+            if (options != undefined) {
+                cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
+                    provider.rpcUrl,
+                    wallets,
+                    options.cosmWasmOptions
+                );
+                stargateClient = await SigningStargateClient.connectWithSigner(
+                    provider.rpcUrl,
+                    wallets,
+                    options.stargateOptions
+                );
+            } else {
+                cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
+                    provider.rpcUrl,
+                    wallets
+                );
+                stargateClient = await SigningStargateClient.connectWithSigner(
+                    provider.rpcUrl,
+                    wallets
+                );
+            }
+            results.push(
+                new Wallet(provider, wallets, accounts[i], cosmWasmClient, stargateClient)
+            );
+        }
+        return results;
     }
-    for (let i = 0; i < amount; i++) {
-      paths.push(makeCosmoshubPath(i));
+
+    public static async getWalletsFromOfflineSigner(
+        provider: Provider,
+        signer: OfflineSigner,
+        options?: WalletOptions
+    ): Promise<Wallet[]> {
+        checkProvider(provider);
+        const results = [];
+        const accounts = await signer.getAccounts();
+        for (let i = 0; i < accounts.length; i++) {
+            let cosmWasmClient: SigningCosmWasmClient;
+            let stargateClient: SigningStargateClient;
+            if (options != undefined) {
+                cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
+                    provider.rpcUrl,
+                    signer,
+                    options.cosmWasmOptions
+                );
+                stargateClient = await SigningStargateClient.connectWithSigner(
+                    provider.rpcUrl,
+                    signer,
+                    options.stargateOptions
+                );
+            } else {
+                cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
+                    provider.rpcUrl,
+                    signer
+                );
+                stargateClient = await SigningStargateClient.connectWithSigner(
+                    provider.rpcUrl,
+                    signer
+                );
+            }
+            results.push(
+                new Wallet(provider, signer, accounts[i], cosmWasmClient, stargateClient)
+            );
+        }
+        return results;
     }
-    const wallets = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-      hdPaths: paths,
-      prefix: prefix,
-    });
-    const accounts = await wallets.getAccounts();
-    const results = [];
-    for (let i = 0; i < accounts.length; i++) {
-      const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
-        provider.rpcUrl,
-        wallets,
-        options.cosmWasmOptions
-      );
-      const stargateClient = await SigningStargateClient.connectWithSigner(
-        provider.rpcUrl,
-        wallets,
-        options.stargateOptions
-      );
-      results.push(
-        new Wallet(
-          wallets,
-          accounts[i],
-          cosmWasmClient,
-          stargateClient,
-          await getDenom(provider)
-        )
-      );
+
+    private constructor(
+        provider: Provider,
+        signer: OfflineSigner,
+        account: AccountData,
+        cosmWasmSigner: SigningCosmWasmClient,
+        stargateSigner: SigningStargateClient
+    ) {
+        this._provider = provider;
+        this._signer = signer;
+        this._account = account;
+        this._cosmWasmSigner = cosmWasmSigner;
+        this._stargateSigner = stargateSigner;
+        this._isWallet = true;
     }
-    return results;
-  }
 
-  public static async getWalletsFromOfflineSigner(
-    provider: Provider,
-    signer: OfflineSigner,
-    prefix: string,
-    options?: WalletOptions
-  ): Promise<Wallet[]> {
-    const results = [];
-    const accounts = await signer.getAccounts();
-    for (let i = 0; i < accounts.length; i++) {
-      const cosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
-        provider.rpcUrl,
-        signer,
-        options.cosmWasmOptions
-      );
-      const stargateClient = await SigningStargateClient.connectWithSigner(
-        provider.rpcUrl,
-        signer,
-        options.stargateOptions
-      );
-      results.push(
-        new Wallet(
-          signer,
-          accounts[i],
-          cosmWasmClient,
-          stargateClient,
-          await getDenom(provider)
-        )
-      );
+    public async getBalance(denom: string):Promise<Coin> {
+        return await this.cosmWasmSigner.getBalance(this.address, denom);
     }
-    return results;
-  }
 
-  private constructor(
-    signer: OfflineSigner,
-    account: AccountData,
-    cosmWasmSigner: SigningCosmWasmClient,
-    stargateSigner: SigningStargateClient,
-    denom: string
-  ) {
-    this._signer = signer;
-    this._account = account;
-    this._cosmWasmSigner = cosmWasmSigner;
-    this._stargateSigner = stargateSigner;
-    this._denom = denom;
-  }
+    get isWallet(): boolean {
+        return this._isWallet;
+    }
+    
+    get address(): string {
+        return this._account.address;
+    }
 
-  public async uploadWasm(
-    wasmCode: Uint8Array,
-    fee?: StdFee,
-    memo?: string
-  ): Promise<UploadResult> {
-    fee = fee == null ? this.getFee(defaultUploadGas, defaultGasPrice) : fee;
-    return await this._cosmWasmSigner.upload(this.address, wasmCode, fee, memo);
-  }
+    get denom(): string {
+        return this._provider.feeToken;
+    }
 
-  public async deloyContractFromCodeId(codeId: number) {}
+    get provider(): Provider {
+        return this._provider;
+    }
 
-  public getFee(gas: number, gasPrice: number): StdFee {
-    return calculateFee(
-      gas,
-      GasPrice.fromString(gasPrice.toString() + this._denom)
-    );
-  }
+    get signer(): OfflineSigner {
+        return this._signer;
+    }
 
-  get address(): string {
-    return this._account.address;
-  }
+    get cosmWasmSigner(): SigningCosmWasmClient {
+        return this._cosmWasmSigner;
+    }
 
-  get denom(): string {
-    return this._denom;
-  }
+    get stargateSigner(): SigningStargateClient {
+        return this._stargateSigner;
+    }
+
+    public coin(denom: string, amount: string): Coin {
+        const coin: Coin = {
+            denom: denom,
+            amount: amount
+        }
+        return coin;
+    }
 }
 
-async function getDenom(provider: Provider): Promise<string> {
-  const cosm = new Cosm(provider);
-  const queryRs = await cosm.cosmos.mint.query.Params({});
-  return queryRs.params.mintDenom;
+const checkProvider = (provider: Provider) => {
+    if (provider.bech32Prefix == undefined || provider.feeToken == undefined) {
+        throw "Require set bech32Prefix and feeToken for Provider";
+    }
 }

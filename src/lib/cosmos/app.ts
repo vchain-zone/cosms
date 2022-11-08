@@ -2,12 +2,16 @@ import { StdFee } from '@cosmjs/amino';
 
 import { Provider } from '../providers';
 import {
+  createProtobufRpcBatchClient,
+  ProtobufRpcBatchClient
+} from '../queryclient/ProtobufRpcBatchClient';
+import {
   createProtobufRpcMessageClient,
-  ProtobufRpcMessageClient,
+  ProtobufRpcMessageClient
 } from '../queryclient/ProtobufRpcMessageClient';
 import {
   createProtobufRpcStateClient,
-  ProtobufRpcStateClient,
+  ProtobufRpcStateClient
 } from '../queryclient/ProtobufRpcStateClient';
 import { Wallet } from '../wallet';
 
@@ -37,17 +41,21 @@ export class App {
   public messageProtobuf;
   public queryProtobuf;
   public query;
+  public queryBatch;
 
   public block: (height?: number) => this;
 
   private provider: Provider;
   private readonly rpc: ProtobufRpcStateClient;
+  private readonly rpcBatch: ProtobufRpcBatchClient;
   private _messageRpc: ProtobufRpcMessageClient;
   private _wallet: Wallet;
 
   constructor(provider: Provider) {
     this.provider = provider;
     this.rpc = createProtobufRpcStateClient(this.provider.batchQueryClient.getQueryClient());
+    // this.rpcBatch = createProtobufRpcBatchClient(this.provider.batchQueryClient);
+    this.rpcBatch = provider.batchClient || createProtobufRpcBatchClient(this.provider.batchQueryClient);
 
     this.block = this.rpc.block;
   }
@@ -64,6 +72,28 @@ export class App {
 
   setQueryClient(QueryClientImpl: any) {
     this.query = new QueryClientImpl(this.rpc);
+    this.queryBatch = new QueryClientImpl(this.rpcBatch);
+    this.query.block = (blockHeight) => {
+      this.rpc.block(blockHeight);
+      return this.query;
+    };
+    this.query.prefixService = (prefix) => {
+      this.rpc.prefixService(prefix);
+      return this.query;
+    };
+
+    this.queryBatch.block = (blockHeight) => {
+      this.rpcBatch.block(blockHeight);
+      return this.queryBatch;
+    };
+    this.queryBatch.prefixService = (prefix) => {
+      this.rpcBatch.prefixService(prefix);
+      return this.queryBatch;
+    };
+    this.queryBatch.setId = (id) => {
+      this.rpcBatch.setId(id);
+      return this.queryBatch;
+    };
   }
 
   setProtobuf(Protobuf: any) {
@@ -99,3 +129,4 @@ export class App {
     return this.messageRpc.send(this.wallet, fee, memo);
   }
 }
+

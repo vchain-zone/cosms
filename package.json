@@ -1,6 +1,6 @@
 {
   "name": "@tovchain/cosms",
-  "version": "0.6.0-beta.0.3",
+  "version": "0.8.0",
   "description": "query data form cosmos base networks template",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -19,6 +19,8 @@
     "test:lint": "eslint src --ext .ts",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
     "test:unit": "NODE_ENV=testing mocha --require ts-node/register --reporter mochawesome --timeout 100000 './src/**/*.spec.ts'",
+    "test-wallet": "NODE_ENV=testing mocha --require ts-node/register --reporter mochawesome --timeout 100000 './src/lib/wallet/index.spec.ts'",
+    "test-wasm": "NODE_ENV=testing mocha --require ts-node/register --reporter mochawesome --timeout 100000 './src/lib/wasm/index.spec.ts'",
     "check-cli": "run-s test diff-integration-tests check-integration-tests",
     "check-integration-tests": "run-s check-integration-test:*",
     "diff-integration-tests": "mkdir -p diff && rm -rf diff/test && cp -r test diff/test && rm -rf diff/test/test-*/.git && cd diff && git init --quiet && git add -A && git commit --quiet --no-verify --allow-empty -m 'WIP' && echo '\\n\\nCommitted most recent integration test output in the \"diff\" directory. Review the changes with \"cd diff && git diff HEAD\" or your preferred git diff viewer.'",
@@ -45,7 +47,9 @@
     "@cosmjs/cosmwasm-stargate": "^0.29.2",
     "@cosmjs/proto-signing": "^0.29.0",
     "@cosmjs/stargate": "^0.29.0",
-    "cosmjs-types": "^0.5.1"
+    "cosmjs-types": "^0.5.1",
+    "crypto-addr-codec": "^0.1.7",
+    "deepmerge": "^4.2.2"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
@@ -59,6 +63,7 @@
     "codecov": "^3.5.0",
     "cspell": "^4.1.0",
     "cz-conventional-changelog": "^3.3.0",
+    "dotenv": "^16.0.3",
     "eslint": "^7.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
@@ -72,9 +77,9 @@
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
     "standard-version": "^9.0.0",
-    "ts-node": "^9.0.0",
-    "typedoc": "^0.19.0",
-    "typescript": "^4.0.2"
+    "ts-node": "^10.9.1",
+    "typedoc": "^0.23.16",
+    "typescript": "^4.8.4"
   },
   "files": [
     "build/main",
