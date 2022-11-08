@@ -26,7 +26,7 @@ export default class APRCalCulator {
   /**
    * ACTUAL_STAKING_APR = STAKING_APR*[ACTUAL_ANNUAL_PROVISION/ANNUAL_PROVISION]
    * @param decimal mint decimal
-   * @returns actual staking APR 
+   * @returns actual staking APR
    */
   async actualStakingAPR(decimal: number): Promise<number> {
     const stakingAPR = await this.stakingAPR(decimal);
@@ -118,11 +118,11 @@ export default class APRCalCulator {
   }
   /**
    * This function to calculator apr from apr
-   * @param stakingAPR staking APR 
+   * @param stakingAPR staking APR
    * @param partition partitions number of a year
-   * @returns 
+   * @returns
    */
-  async stakingAPY(stakingAPR: number, partition: number = 0): Promise<number> {
+  stakingAPY(stakingAPR: number, partition = 0): number {
     if (partition === 0) {
       return Math.exp(stakingAPR)
     }
