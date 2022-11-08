@@ -116,6 +116,19 @@ export default class APRCalCulator {
     );
     return validatorCommission;
   }
+  /**
+   * This function to calculator apr from apr
+   * @param stakingAPR staking APR 
+   * @param partition partitions number of a year
+   * @returns 
+   */
+  async stakingAPY(stakingAPR: number, partition: number = 0): Promise<number> {
+    if (partition === 0) {
+      return Math.exp(stakingAPR)
+    }
+    else
+      return (1 + stakingAPR / partition) ** partition;
+  }
 }
 function uint8ArrayStringToNumber(
   x: Uint8Array | string,
