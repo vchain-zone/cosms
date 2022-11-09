@@ -124,10 +124,10 @@ export default class APRCalCulator {
    */
   stakingAPY(stakingAPR: number, partition = 0): number {
     if (partition === 0) {
-      return Math.exp(stakingAPR)
+      return Math.exp(stakingAPR) - 1;
     }
     else
-      return (1 + stakingAPR / partition) ** partition;
+      return (1 + stakingAPR / partition) ** partition - 1;
   }
 }
 function uint8ArrayStringToNumber(
