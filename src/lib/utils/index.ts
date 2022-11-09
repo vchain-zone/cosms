@@ -5,6 +5,7 @@ import { Uint8ArrayHelper } from './Uint8ArrayHelper';
 import { Bech32Helper } from './bench32helper';
 
 
+
 export class Utils {
   static crypto = crypto;
   static protoSigning = protoSigning;

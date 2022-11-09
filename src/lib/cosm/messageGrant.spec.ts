@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import {
   AuthorizationType,
   StakeAuthorization
@@ -83,11 +84,36 @@ describe('Cosm test', async () => {
       let tx = await cosm.cosmos.authz.sendMessage(fee, 'Setup for enable auto compound staking ');
       console.log(tx);
 
-      const grants = await cosm.cosmos.authz.query.GranteeGrants({
-        grantee: granteeWallet.address
+      // const grants = await cosm.cosmos.authz.query.GranteeGrants({
+      //   grantee: granteeWallet.address
+      // });
+      // console.log(grants);
+      // console.log(grants.grants[0].expiration);
+
+      // check auth delegate granter, grantee , validator
+      const grants = await cosm.cosmos.authz.query.Grants({
+        grantee: granteeWallet.address,
+        granter: granterWallet.address,
+        msgTypeUrl: '/cosmos.staking.v1beta1.MsgDelegate'
       });
-      console.log(grants);
-      console.log(grants.grants[0].expiration);
+
+      // check granter , grantee exit
+      expect(grants.grants.length).is.gt(0);
+
+      // check allow validator
+      let checkValidator = operator;
+      let pass = false;
+      console.log("StakeAuthorization decoded :");
+      for (const grant of grants.grants) {
+        let decoded = StakeAuthorization.decode(grant.authorization.value);
+
+        console.log(decoded);
+        if (decoded.allowList.address.includes(checkValidator)) {
+          pass = true;
+        }
+      }
+      expect(pass).is.eq(true);
+
     });
 
     it('Disable grant DELEGATE', async function() {
@@ -95,7 +121,6 @@ describe('Cosm test', async () => {
         granter: granterWallet.address,
         grantee: granteeWallet.address,
         msgTypeUrl: '/cosmos.staking.v1beta1.MsgDelegate'
-
       });
 
       let tx2 = await cosm.cosmos.authz.sendMessage(fee, 'Setup auto compound staking ');
