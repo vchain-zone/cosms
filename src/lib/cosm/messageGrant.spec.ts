@@ -20,7 +20,7 @@ const fee = {
 
 const rpcUrl = 'http://159.223.35.6:27010/';
 const operator = 'cosmosvaloper1zk4sn5ch33knss640wv90rwcvcwhlfnujfzksd';
-const granterPrivate = 'hollow oyster hobby embark raccoon problem hint soda mad sand moon warrior life mushroom journey program receive picture sing know sample almost glimpse sniff';
+const granterPrivate = 'verify client drill seat loud below actor elegant split thank edge amused pudding token crime network entire orbit fault century tattoo sunset old forget';
 const granteePrivate = 'sadness kit excuse arctic apart spring become hotel extra escape dune flush business lava involve only powder practice gun excess change surge equal speak';
 const bech32Prefix = 'cosmos';
 const feeToken = 'stake';
@@ -104,7 +104,7 @@ describe('Cosm test', async () => {
       const grants2 = await cosm.cosmos.authz.query.Grants({
         grantee: granteeWallet.address,
         granter: granterWallet.address,
-        msgTypeUrl: ''
+        msgTypeUrl: '/cosmos.staking.v1beta1.MsgDelegate'
       });
 
       console.log(grants2);
