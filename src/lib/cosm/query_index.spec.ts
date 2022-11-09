@@ -9,6 +9,7 @@ import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
 import { BondStatus } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import Long from 'long';
 import 'mocha';
+import { Distribution } from '../cosmos/distribution';
 
 import { BaseProvider } from '../providers';
 
@@ -215,7 +216,7 @@ describe('Cosm test', async () => {
 
   describe('Test distribution query', async () => {
     it('should get distribution info', async function() {
-      const distribution = cosm.cosmos.distribution;
+      const distribution : Distribution = cosm.cosmos.distribution;
 
       const validatorDelegationsResponse = await cosm.cosmos.staking
         .query.block(currentBlock - 100).ValidatorDelegations({ validatorAddr: validatorAddr });
