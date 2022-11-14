@@ -1,4 +1,5 @@
 import 'mocha';
+import { expect } from 'chai';
 import { BaseProvider } from '../providers';
 
 import Cosm from './index';
@@ -22,6 +23,20 @@ describe('Cosm test', async () => {
     cosm = new Cosm(provider);
   });
 
+  describe("Test convert address to difference prefix", ()=>{
+    it("Test address orai", ()=>{
+      const address = "orai1mxqeldsxg60t2y6gngpdm5jf3k96dnjuanyv3w"
+      const addressOpe = "oraivaloper1mxqeldsxg60t2y6gngpdm5jf3k96dnju5el96f"
+      const prefix = "orai"
+      const prefixOpe = "oraivaloper"
+
+      const hexAddress = Cosm.utils.bech32.toHex(address);
+      const addressOpeGen = Cosm.utils.bech32.toBech32(prefixOpe,hexAddress);
+
+      expect(addressOpeGen).is.eq(addressOpe);
+      console.log(addressOpeGen);
+    })
+  })
   describe('Test message', async () => {
     it('Test helper', async function() {
 

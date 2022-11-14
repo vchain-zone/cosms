@@ -1,3 +1,4 @@
+import { pubkeyToAddress } from '@cosmjs/tendermint-rpc/build/addresses';
 import {
   QueryValidatorOutstandingRewardsResponse
 } from 'cosmjs-types/cosmos/distribution/v1beta1/query';
@@ -5,11 +6,12 @@ import {
   QueryValidatorsResponse
 } from 'cosmjs-types/cosmos/staking/v1beta1/query';
 import { BondStatus } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
+import { Any } from 'cosmjs-types/google/protobuf/any';
+
+import crypto from 'crypto';
 import { BaseProvider } from '../providers';
 
 import Cosm from './index';
-
-
 // const rpcUrl = 'http://167.99.119.182:46657';
 const rpcUrl = 'https://rpc.orai.io';
 
@@ -20,6 +22,13 @@ async function test2() {
 
   const latestBlock = await provider.batchQueryClient.getHeight();
   const sampleValAddress = 'oraivaloper1ltr3sx9vm9hq4ueajvs7ng24gw3k8t9tn5lh6s';
+
+  let val = await cosm.cosmos.staking.query.Validator({ validatorAddr: sampleValAddress });
+
+  let cosPub = val.validator.consensusPubkey.value
+
+  const address = pubkeyToAddress("ed25519",cosPub.slice(2,34))
+  console.log(address);
 
   /// query validator multi blocks
 
@@ -72,6 +81,8 @@ async function test2() {
     let dataDecoded = QueryValidatorOutstandingRewardsResponse.decode(data.value);
     decodedResult[requestId] = dataDecoded;
   }
+
+
 
   console.log(decodedResult);
 

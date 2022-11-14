@@ -85,3 +85,5 @@ export const Bech32Helper = {
   toBech32,
   fromBytes
 };
+
+
