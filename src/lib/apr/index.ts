@@ -44,12 +44,11 @@ export default class APRCalCulator {
   async finalStakingAPR(
     validatorAddress: string,
     mintDecimal: number,
-    distributionDecimal: number
   ): Promise<number> {
     const actualStakingAPR = await this.actualStakingAPR(mintDecimal);
     const validatorCommission = await this.validatorCommission(
       validatorAddress,
-      distributionDecimal
+      mintDecimal
     );
     return actualStakingAPR * (1 - validatorCommission);
   }
@@ -107,11 +106,11 @@ export default class APRCalCulator {
     validatorAddress: string,
     decimal: number
   ): Promise<number> {
-    const data = await this.cosmos.distribution.query.ValidatorCommission({
-      validatorAddress: validatorAddress,
+    const data = await this.cosmos.staking.query.Validator({
+      validatorAddr: validatorAddress
     });
     const validatorCommission = uint8ArrayStringToNumber(
-      data.commission.commission[0].amount,
+      data.validator.commission.commissionRates.rate,
       decimal
     );
     return validatorCommission;
