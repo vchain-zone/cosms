@@ -8,7 +8,7 @@ import {
   HttpClient,
   HttpEndpoint
 } from '@cosmjs/tendermint-rpc/build/rpcclients';
-import { http } from '@cosmjs/tendermint-rpc/build/rpcclients/httpclient';
+import { http } from '@cosmjs/tendermint-rpc/build/rpcclients/http';
 
 export class BatchHttpClient extends HttpClient {
   protected readonly declare url: string;
