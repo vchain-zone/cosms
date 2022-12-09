@@ -27,7 +27,7 @@ export function createProtobufRpcStateClient(
       self['prefixService'] = prefix;
       return this;
     },
-    request: (
+    request:async (
       service: string,
       method: string,
       data: Uint8Array
@@ -44,6 +44,8 @@ export function createProtobufRpcStateClient(
       try {
         let res = base.queryUnverified(path, data, height);
         return res;
+        // const response = await base.queryAbci(path, data, undefined);
+        // return response.value;
       } catch (e) {
         const f = new Uint8Array([]);
         return new Promise((resolve) => resolve(f));

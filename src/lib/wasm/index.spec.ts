@@ -78,6 +78,7 @@ describe('Test Wasm', async () => {
         };
         const initResult = await wasm.initContract(initMsg);
         expect(initResult.contractAddress).to.not.be.null;
+        console.log(initResult);
 
         const executeMsg: ExecuteMessage = {
             contractAddr: initResult.contractAddress,
@@ -99,7 +100,15 @@ describe('Test Wasm', async () => {
                 }
             }
         };
+
+        let currentBlock = await provider.batchQueryClient.getHeight();
+        console.log(currentBlock);
         const queryResult = await wasm.query(queryMsg);
-        // console.log(queryResult);
+      console.log(queryResult);
+
+
+
+        const queryResult2 = await wasm.query(queryMsg,initResult.height);
+        console.log(queryResult2);
     });
 });

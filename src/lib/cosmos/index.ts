@@ -22,6 +22,7 @@ import { Staking } from './staking';
 import { Tx } from './tx';
 import { Upgrade } from './upgrade';
 import { Vesting } from './vesting';
+import { Wasm } from './wasm';
 
 export default class Cosmos {
   set wallet(value: Wallet) {
@@ -57,6 +58,7 @@ export default class Cosmos {
   public tx: Tx;
   public upgrade: Upgrade;
   public vesting: Vesting;
+  public wasm: Wasm;
   private _wallet: Wallet;
 
   constructor(provider: Provider) {
@@ -82,6 +84,7 @@ export default class Cosmos {
     this.tx = new Tx(provider);
     this.upgrade = new Upgrade(provider);
     this.vesting = new Vesting(provider);
+    this.wasm = new Wasm(provider);
     this.version = version;
   }
 
@@ -107,5 +110,6 @@ export default class Cosmos {
     this.tx.wallet = wallet;
     this.upgrade.wallet = wallet;
     this.vesting.wallet = wallet;
+    this.wasm.wallet = wallet;
   }
 }
