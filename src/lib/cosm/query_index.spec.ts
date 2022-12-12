@@ -25,7 +25,7 @@ const rpcUrl = 'https://testnet.rpc.orai.io';
 // const rpcUrl = "https://rpc-osmosis.keplr.app";
 // const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
 let provider;
-let cosm;
+let cosm: Cosm;
 let wallet: DirectSecp256k1HdWallet;
 let client;
 let account: AccountData;
@@ -216,7 +216,7 @@ describe('Cosm test', async () => {
 
   describe('Test distribution query', async () => {
     it('should get distribution info', async function() {
-      const distribution : Distribution = cosm.cosmos.distribution;
+      const distribution: Distribution = cosm.cosmos.distribution;
 
       const validatorDelegationsResponse = await cosm.cosmos.staking
         .query.block(currentBlock - 100).ValidatorDelegations({ validatorAddr: validatorAddr });
@@ -288,5 +288,37 @@ describe('Cosm test', async () => {
       // let denom = await cosm.cosmos.bank.query.DenomMetadata({ denom: 'orai' });
       // console.log(denom);
     });
+  });
+
+  describe('Get txs', async () => {
+    it('should get blocks with txs', async function() {
+
+      let block = await cosm.cosmos.tx.query.GetBlockWithTxs({
+        height: Long.fromNumber(10159176),
+        pagination: {
+          key:Uint8Array.from([0,1]),
+          offset: Long.fromNumber(0),
+          limit: Long.fromNumber(100),
+          countTotal: true,
+          reverse: false
+        }
+      });
+      console.log(block);
+    });
+    it('should get txs by hash', async function() {
+
+      // tx transfer
+      let tx = await cosm.cosmos.tx.query.GetTx({
+        hash : "51EAEE06216802648BCE3D7ACE4FDADF845402251DE76D8065613E4AC97B63E7"
+      });
+      console.log(tx);
+
+      //tx
+      let tx2 = await cosm.cosmos.tx.query.GetTx({
+        hash : "739363AB226D5C4B8BD0C416EE9627A880FD5044F6EA25D20DA94C5510ECE938"
+      });
+      console.log(tx2);
+    });
+
   });
 });
