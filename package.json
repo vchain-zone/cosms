@@ -1,6 +1,6 @@
 {
   "name": "@tovchain/cosms",
-  "version": "0.8.7-beta",
+  "version": "0.8.7-beta1",
   "description": "query data form cosmos base networks template",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",

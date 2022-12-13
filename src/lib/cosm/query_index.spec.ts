@@ -1,14 +1,17 @@
 import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
+import { defaultRegistryTypes } from "@cosmjs/stargate";
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
 import { SigningStargateClient } from '@cosmjs/stargate';
 import {
   PrivateSigningStargateClient
 } from '@cosmjs/stargate/build/signingstargateclient';
 import { expect } from 'chai';
+import { MsgExec } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
 import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
 import { BondStatus } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import Long from 'long';
 import 'mocha';
+import _m0 from 'protobufjs/minimal';
 import { Distribution } from '../cosmos/distribution';
 
 import { BaseProvider } from '../providers';
@@ -296,7 +299,7 @@ describe('Cosm test', async () => {
       let block = await cosm.cosmos.tx.query.GetBlockWithTxs({
         height: Long.fromNumber(10159176),
         pagination: {
-          key:Uint8Array.from([0,1]),
+          key: Uint8Array.from([0, 1]),
           offset: Long.fromNumber(0),
           limit: Long.fromNumber(100),
           countTotal: true,
@@ -307,16 +310,41 @@ describe('Cosm test', async () => {
     });
     it('should get txs by hash', async function() {
 
+      const registry = new Registry(defaultRegistryTypes);
+
       // tx transfer
       let tx = await cosm.cosmos.tx.query.GetTx({
-        hash : "51EAEE06216802648BCE3D7ACE4FDADF845402251DE76D8065613E4AC97B63E7"
+        hash: '51EAEE06216802648BCE3D7ACE4FDADF845402251DE76D8065613E4AC97B63E7'
       });
       console.log(tx);
+      let messages = tx.tx.body.messages;
+      for (const message of messages) {
+
+        console.log(message.typeUrl);
+        let decoded = cosm.cosmos.tx.registry.decode(message)
+        // let decoded = MsgSend.decode(new _m0.Reader(message.value));
+        console.log(decoded);
+      }
 
       //tx
       let tx2 = await cosm.cosmos.tx.query.GetTx({
-        hash : "739363AB226D5C4B8BD0C416EE9627A880FD5044F6EA25D20DA94C5510ECE938"
+        hash: '739363AB226D5C4B8BD0C416EE9627A880FD5044F6EA25D20DA94C5510ECE938'
       });
+
+      let messages2 = tx2.tx.body.messages;
+      for (const message of messages2) {
+
+        console.log(message.typeUrl);
+        let decoded = cosm.cosmos.tx.registry.decode(message)
+        console.log(decoded);
+        let msgs =[]
+        for (const msg of decoded.msgs) {
+          let decoded2 = cosm.cosmos.tx.registry.decode(msg)
+          console.log(decoded2);
+          msgs.push(decoded2)
+        }
+
+      }
       console.log(tx2);
     });
 
