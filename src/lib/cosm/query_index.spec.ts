@@ -1,17 +1,14 @@
 import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
-import { defaultRegistryTypes } from "@cosmjs/stargate";
 import { AccountData } from '@cosmjs/proto-signing/build/signer';
-import { SigningStargateClient } from '@cosmjs/stargate';
+import { defaultRegistryTypes, SigningStargateClient } from '@cosmjs/stargate';
 import {
   PrivateSigningStargateClient
 } from '@cosmjs/stargate/build/signingstargateclient';
 import { expect } from 'chai';
-import { MsgExec } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
 import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
 import { BondStatus } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import Long from 'long';
 import 'mocha';
-import _m0 from 'protobufjs/minimal';
 import { Distribution } from '../cosmos/distribution';
 
 import { BaseProvider } from '../providers';
@@ -321,7 +318,7 @@ describe('Cosm test', async () => {
       for (const message of messages) {
 
         console.log(message.typeUrl);
-        let decoded = cosm.cosmos.tx.registry.decode(message)
+        let decoded = cosm.cosmos.tx.registry.decode(message);
         // let decoded = MsgSend.decode(new _m0.Reader(message.value));
         console.log(decoded);
       }
@@ -335,13 +332,13 @@ describe('Cosm test', async () => {
       for (const message of messages2) {
 
         console.log(message.typeUrl);
-        let decoded = cosm.cosmos.tx.registry.decode(message)
+        let decoded = cosm.cosmos.tx.registry.decode(message);
         console.log(decoded);
-        let msgs =[]
+        let msgs = [];
         for (const msg of decoded.msgs) {
-          let decoded2 = cosm.cosmos.tx.registry.decode(msg)
+          let decoded2 = cosm.cosmos.tx.registry.decode(msg);
           console.log(decoded2);
-          msgs.push(decoded2)
+          msgs.push(decoded2);
         }
 
       }
