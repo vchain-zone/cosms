@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.3](https://github.com/vchain-zone/cosms/compare/v0.8.5...v0.8.3) (2022-12-13)
+
+
+### Features
+
+* update import http client from cosmjs v0.29.4 ([06095d0](https://github.com/vchain-zone/cosms/commit/06095d0dc439360ca042d88ca3f4e6068f34b7a1))
+* update new query state for wasm ([63afb53](https://github.com/vchain-zone/cosms/commit/63afb532ac071992f2b171a31911d4f9ac52da76))
+* update query tx ([e027271](https://github.com/vchain-zone/cosms/commit/e02727113061c9d9b647101a397c5f6a7f7eeec1))
+* update registry for decode tx ([9c207ca](https://github.com/vchain-zone/cosms/commit/9c207ca158e7fd6ee16697bf7dab5cfed4d7e9f3))
+* update release 0.8.8 ([4040c01](https://github.com/vchain-zone/cosms/commit/4040c01862dcb334be56cd5bba1984b0af244682))
+
+
+### Bug Fixes
+
+* remove sensitive data ([3a31eb1](https://github.com/vchain-zone/cosms/commit/3a31eb1392bcb72f81d55b934a9f4e3916649cc7))
+
 ### 0.8.5 (2022-11-25)
 
 
