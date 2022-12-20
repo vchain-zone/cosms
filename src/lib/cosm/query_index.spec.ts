@@ -325,7 +325,7 @@ describe('Cosm test', async () => {
 
       //tx
       let tx2 = await cosm.cosmos.tx.query.GetTx({
-        hash: '739363AB226D5C4B8BD0C416EE9627A880FD5044F6EA25D20DA94C5510ECE938'
+        hash: 'eadc8cf8202668ba0c7e58d8387be09497b930901c2c3afec6a0d90e98d0f501'
       });
 
       let messages2 = tx2.tx.body.messages;
@@ -334,12 +334,12 @@ describe('Cosm test', async () => {
         console.log(message.typeUrl);
         let decoded = cosm.cosmos.tx.registry.decode(message);
         console.log(decoded);
-        let msgs = [];
-        for (const msg of decoded.msgs) {
-          let decoded2 = cosm.cosmos.tx.registry.decode(msg);
-          console.log(decoded2);
-          msgs.push(decoded2);
-        }
+        // let msgs = [];
+        // for (const msg of decoded.msgs) {
+        //   let decoded2 = cosm.cosmos.tx.registry.decode(msg);
+        //   console.log(decoded2);
+        //   msgs.push(decoded2);
+        // }
 
       }
       console.log(tx2);

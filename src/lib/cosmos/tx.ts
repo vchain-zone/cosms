@@ -1,3 +1,4 @@
+import { wasmTypes } from '@cosmjs/cosmwasm-stargate/build/modules';
 import { Registry } from '@cosmjs/proto-signing';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
 import { ServiceClientImpl } from 'cosmjs-types/cosmos/tx/v1beta1/service';
@@ -13,6 +14,7 @@ export class Tx extends App {
   constructor(provider: Provider) {
     super(provider);
     this.setQueryClient(ServiceClientImpl);
-    this.registry = new Registry(defaultRegistryTypes);
+    let RegistryTypes = wasmTypes.concat(defaultRegistryTypes);
+    this.registry = new Registry(RegistryTypes);
   }
 }
