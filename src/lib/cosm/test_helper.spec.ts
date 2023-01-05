@@ -30,6 +30,7 @@ describe('Cosm test', async () => {
 
       let uptime = await cosm.helper.getUptimeBatch(start, end, 4);
       console.log(uptime);
+
     });
   });
 });
