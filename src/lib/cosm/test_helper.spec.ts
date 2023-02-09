@@ -25,12 +25,14 @@ describe('Cosm test', async () => {
   describe('Test message', async () => {
     it('Test helper', async function() {
 
-      const end = await provider.batchQueryClient.getHeight();
-      const start = end - 9;
+      // const end = await provider.batchQueryClient.getHeight();
+      // const start = end - 9;
 
-      let uptime = await cosm.helper.getUptimeBatch(start, end, 4);
-      console.log(uptime);
+      // let uptime = await cosm.helper.getUptimeBatch(start, end, 4);
+      // console.log(uptime);
 
+      let balance = await cosm.cosmos.bank.query.AllBalances({address:"orai1s863xxyrj72c6vcecggewzzm9nfxw5l9kte43u"})
+      console.log(balance);
     });
   });
 });

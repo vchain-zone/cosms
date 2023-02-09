@@ -78,7 +78,9 @@ function fromBytes(prefix, bytes: ArrayLike<number>) {
   return bech32.encode(prefix, bech32.toWords(bytes));
 }
 
-
+const hex = toHex("oraib1ytrdc2gx8xx9yg27du8ngyqlw9khqvjv3lrdmr")
+const ben = toBech32("oraibvaloper",hex)
+console.log(ben);
 export const Bech32Helper = {
   converter,
   toHex,

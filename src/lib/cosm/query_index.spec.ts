@@ -18,7 +18,8 @@ import Cosm from './index';
 import { defaultSigningClientOptions, faucet } from './testutils.spec';
 
 
-const rpcUrl = 'https://testnet.rpc.orai.io';
+// const rpcUrl = 'https://testnet.rpc.orai.io';
+const rpcUrl = 'https://rpc-stride.nodeist.net/';
 // const rpcUrl = 'https://rpc.orai.io';
 // const rpcUrl = 'https://sifchain-rpc.polkachu.com';
 // const rpcUrl = "https://rpc-cosmoshub.keplr.app";
@@ -294,7 +295,7 @@ describe('Cosm test', async () => {
     it('should get blocks with txs', async function() {
 
       let block = await cosm.cosmos.tx.query.GetBlockWithTxs({
-        height: Long.fromNumber(10159176),
+        height: Long.fromNumber(1871190),
         pagination: {
           key: Uint8Array.from([0, 1]),
           offset: Long.fromNumber(0),
@@ -343,6 +344,18 @@ describe('Cosm test', async () => {
 
       }
       console.log(tx2);
+    });
+    it('should get txs event', async function() {
+
+      const registry = new Registry(defaultRegistryTypes);
+
+      // tx transfer
+      let tx = await cosm.cosmos.tx.query.GetTxsEvent({
+        events: ["message.action='/ibc.applications.transfer.v1.MsgTransfer'", 'tx.minHeight=1870965', 'tx.maxHeight=1871671'],
+        orderBy: 2
+      });
+      console.log(tx);
+
     });
 
   });
