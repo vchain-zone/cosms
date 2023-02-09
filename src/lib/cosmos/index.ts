@@ -15,6 +15,7 @@ import { Evidence } from './evidence';
 import { FeeGrant } from './feegrant';
 import { Genutil } from './genutil';
 import { Gov } from './gov';
+import { Ibc } from './ibc';
 import { Mint } from './mint';
 import { Params } from './params';
 import { Slashing } from './slashing';
@@ -55,6 +56,7 @@ export default class Cosmos {
   public params: Params;
   public slashing: Slashing;
   public staking: Staking;
+  public ibc: Ibc;
   public tx: Tx;
   public upgrade: Upgrade;
   public vesting: Vesting;
@@ -83,6 +85,7 @@ export default class Cosmos {
     this.staking = new Staking(provider);
     this.tx = new Tx(provider);
     this.upgrade = new Upgrade(provider);
+    this.ibc = new Ibc(provider);
     this.vesting = new Vesting(provider);
     this.wasm = new Wasm(provider);
     this.version = version;
@@ -111,5 +114,6 @@ export default class Cosmos {
     this.upgrade.wallet = wallet;
     this.vesting.wallet = wallet;
     this.wasm.wallet = wallet;
+    this.ibc.wallet = wallet;
   }
 }
