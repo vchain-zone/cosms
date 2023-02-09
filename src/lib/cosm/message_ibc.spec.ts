@@ -1,12 +1,7 @@
 import { Registry } from '@cosmjs/proto-signing';
-import { AccountData } from '@cosmjs/proto-signing/build/signer';
-import { coin } from '@cosmjs/stargate';
 import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
-import { Coin } from 'cosmjs-types/cosmos/base/v1beta1/coin';
-import { BondStatus } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import 'mocha';
 import { MsgTransfer } from 'cosmjs-types/ibc/applications/transfer/v1/tx';
-import { Height } from 'cosmjs-types/ibc/core/client/v1/client';
 import Long from 'long';
 
 import { BaseProvider } from '../providers';
@@ -14,9 +9,10 @@ import { Wallet } from '../wallet';
 
 import Cosm from './index';
 
-import { defaultAccount, defaultSigningClientOptions } from './testutils.spec';
+import { defaultSigningClientOptions } from './testutils.spec';
 import { config } from 'dotenv';
-config()
+
+config();
 const rpcUrl = 'https://rpc.orai.io';
 let provider;
 let cosm: Cosm;
