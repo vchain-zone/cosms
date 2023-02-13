@@ -11,6 +11,7 @@ dotenv.config();
 // const rpcUrl = 'https://osmosis-testnet-rpc.allthatnode.com:26657';
 const RPC_URL = 'https://rpc.malaga-420.cosmwasm.com';
 const MNEMONIC = process.env.MNEMONIC;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const PREFIX = 'wasm';
 const DENOM = 'umlg';
 let provider: BaseProvider;
@@ -32,6 +33,15 @@ describe('Test wallet', async () => {
 
     it("Test getWalletsFromMnemonic()", async () => {
         wallets = await Wallet.getWalletsFromMnemonic(provider, MNEMONIC, 10);
+        for (let i = 0; i < wallets.length; i++) {
+            const wallet = wallets[i];
+            expect(wallet.address.startsWith(PREFIX)).to.be.true;
+            expect(wallet.denom).to.be.equal(DENOM);
+        }
+    });
+
+    it("Test getWalletsFromKeyc()", async () => {
+        wallets = await Wallet.getWalletFromKey(provider, PRIVATE_KEY);
         for (let i = 0; i < wallets.length; i++) {
             const wallet = wallets[i];
             expect(wallet.address.startsWith(PREFIX)).to.be.true;

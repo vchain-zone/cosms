@@ -77,10 +77,6 @@ describe('Cosm test', async () => {
       };
 
       await cosm.cosmos.ibc.message.Transfer(transferIbc);
-
-      const currentMessage = cosm.cosmos.staking.getCurrentMessage();
-      console.log(currentMessage);
-
       const fee = {
         amount: [
           {
