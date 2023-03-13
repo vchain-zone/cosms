@@ -45,6 +45,6 @@
     "src/**/*.ts",
     "node_modules/@types/mocha/index.d.ts"
   ],
-  "exclude": ["node_modules/**"],
+  "exclude": ["node_modules/**","src/**/*.spec.ts"],
   "compileOnSave": false
 }

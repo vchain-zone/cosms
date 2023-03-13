@@ -116,6 +116,14 @@ export class App {
     this._messageRpc.prefixService(this._prefixServicesName);
     this.message = new Message.MsgClientImpl(this.messageRpc);
   }
+  createMessageInstance(Message:any,prefixServicesName?:string){
+    const messageRpc = createProtobufRpcMessageClient(
+      this.provider.batchQueryClient.getQueryClient(),
+      Message
+    );
+    messageRpc.prefixService(prefixServicesName);
+    return  new Message.MsgClientImpl(messageRpc);
+  }
 
   setWallet(wallet: Wallet) {
     this._wallet = wallet;
